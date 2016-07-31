@@ -1,0 +1,21 @@
+* we will start with a vanilla cluster of node-sized VMs plus 1 head node.
+* The cluster will run Torque - use the XNIT
+* The cluster will have a common file system - NFS for now,  until we can shrae vol's or something
+* Cluster will initially run Quantum Espresso, NWChem, maybe Yambo.  Sudhakar will install these.
+* The gateway group will bring the users, make sure things work with Airavata.
+* Eric and Barb will use the Puppet + Ansible approach for setting up the cluster.
+* MPI needs to work across nodes.
+* Discuss with Mike, Jeremy, George at the beginning to make sure we are doing sensible things, not duplicating work, etc.
+* We need to confirm that CPU utilization is the metric that needs to improve.
+* We think that the system will be in place by September 1 for testing by SEAGrid, and that we can be at full utilization by October 15.
+
+SSH Keys:
+already added by jetstream creation process
+just need to point to the right private key for ansible
+ - only on the master machine!
+use a .config file? - talk to Jeremy & Co. about this
+
+MPI/Compilers
+I don't think we have Intel compilers... blergh.
+(no response, anyway...)
+ 
