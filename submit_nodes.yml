@@ -1,14 +1,16 @@
 ---
-- hosts: submit_nodes
-  roles:
-    - torque_server
-    - Maui_master
-    - nfs_server
-    - ntp_server
-    - grid_user
-    - mpi
-    - xnit
-    - ganglia_master
-    - XMonDServer? - someday
-    - dhcp
-    - dns
+ - hosts: submit_nodes
+   roles:
+     - xnit
+#     - torque_server
+#     - Maui_master
+#     - nfs_server
+#     - ntp_server
+#     - grid_user
+#      - ssh_gen_grid_user 
+#     - ssh_bastion
+#     - mpi
+#     - ganglia_master
+#     - XMonDServer? - someday
+#     - dhcp
+#     - dns

@@ -5,6 +5,10 @@ ZFS???
 Directory Layout:
 
 Jetstream_Cluster/
+ #config files for ansible itself
+ ssh.cfg
+ ansible.cfg 
+
  submit_nodes #inventory of submit nodes 192.168.56.101
  compute_nodes #inventory of compute nodes 192.168.56.103,104
  cluster.yml # master playbook

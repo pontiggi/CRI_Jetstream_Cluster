@@ -1,9 +1,9 @@
 ---
 - hosts: compute_nodes
   roles:
-    - torque_client
-    - nfs_client
-    - ganglia_client
-    - ntp_client
-    - grid_user
     - xnit
+#    - torque_client
+#    - nfs_client
+#    - ganglia_client
+#    - ntp_client
+#    - common

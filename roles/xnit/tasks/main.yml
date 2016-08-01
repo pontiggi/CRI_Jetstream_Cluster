@@ -1,0 +1,9 @@
+---
+ 
+ - name: install the XNIT repository
+   yum_repository:
+     name: xnit
+     description: XSEDE National Integration Toolkit
+     baseurl: http://cb-repo.iu.xsede.org/xsederepo/centos7
+     enabled: yes
+     gpgcheck: no
