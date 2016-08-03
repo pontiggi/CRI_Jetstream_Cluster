@@ -9,6 +9,11 @@ Need to enable yum tunnel for computes? NOT NOW
 
 THERE ARE FOUR THINGS NEEDED:
 grid_user
+ - add user on submit host
+ - generate ssh key on host
+ - copy pub key back to local machine
+ - deploy user on compute host
+ - add key to auth keys on computes
 ntp
 torque (not maui; only ONE queue)
 mpi 
