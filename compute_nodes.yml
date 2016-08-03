@@ -4,8 +4,8 @@
     - common
     - xnit
     - grid_user
+    - ntp
 #    - torque_client
 #    - nfs_client
 #    - ganglia_client
-#    - ntp_client
 #    - common

@@ -4,10 +4,10 @@
      - common
      - xnit
      - grid_user
+     - ntp
 #     - torque_server
 #     - Maui_master
 #     - nfs_server
-#     - ntp_server
 #      - ssh_gen_grid_user 
 #     - ssh_bastion
 #     - mpi
