@@ -1,6 +1,10 @@
 Use some damn Roles
  - Submit nodes, and compute nodes - allows for scaling if necessary
-ZFS???
+
+Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
+ ARGH SELINUX - restorecon on authorized_keys
+
+Need to enable yum tunnel for computes...
 
 Directory Layout:
 
