@@ -3,7 +3,7 @@
   roles:
     - common
     - xnit
-    - grid_user_compute
+    - grid_user
 #    - torque_client
 #    - nfs_client
 #    - ganglia_client
