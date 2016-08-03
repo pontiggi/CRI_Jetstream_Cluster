@@ -4,7 +4,16 @@ Use some damn Roles
 Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
  ARGH SELINUX - restorecon on authorized_keys
 
-Need to enable yum tunnel for computes...
+Need to enable yum tunnel for computes? NOT NOW
+ - JUST GIVE PUBLIC ETHERNET TO ERRYTHING
+
+THERE ARE FOUR THINGS NEEDED:
+grid_user
+ntp
+torque (not maui; only ONE queue)
+mpi 
+
+NOTHING ELSE FOR NOW, ID10T
 
 Directory Layout:
 
