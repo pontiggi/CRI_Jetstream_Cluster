@@ -3,7 +3,7 @@
    roles:
      - common
      - xnit
-     - grid_user_submit
+     - grid_user
 #     - torque_server
 #     - Maui_master
 #     - nfs_server
