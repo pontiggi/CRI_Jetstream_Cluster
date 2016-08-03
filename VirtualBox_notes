@@ -1,0 +1,12 @@
+Seagrid Head:
+ CentOS minimal
+ 2 nic:
+  1 NAT
+  1 host-only
+
+Seagrid comp*:
+ CentOS minimal
+ 2 nic:
+  1 NAT (for now; ideally would all be private, but delaying setup of 
+         yum tunneling for now...)
+  1 host-only
