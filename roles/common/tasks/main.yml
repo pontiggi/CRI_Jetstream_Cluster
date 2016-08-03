@@ -1,0 +1,19 @@
+---
+ 
+ - name: install common packages
+   yum: name={{ item }} state=latest
+   with_items:
+     - "vim" 
+     - "rsync"
+     - "libselinux-python"
+#     - "epel-release"
+#     - "wget" 
+#     - "tcpdump"
+#     - "whois" 
+#     - "lsof" 
+#     - "xinetd"
+#     - "net-tools"
+#     - "exportfs" 
+#     - "firewalld"
+#     - "pciutils"
+#     - "ntp"
