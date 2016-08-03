@@ -1,7 +1,9 @@
 ---
 - hosts: compute_nodes
   roles:
+    - common
     - xnit
+    - grid_user_compute
 #    - torque_client
 #    - nfs_client
 #    - ganglia_client
