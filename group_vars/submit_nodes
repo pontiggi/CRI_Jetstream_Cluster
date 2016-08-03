@@ -1,3 +1,3 @@
 ---
- 
- ntp_server: yes
+ submit_host: "yes"
+ ntp_server: "yes"
