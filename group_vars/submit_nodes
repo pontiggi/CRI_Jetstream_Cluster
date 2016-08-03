@@ -1,3 +1,4 @@
 ---
  submit_host: "yes"
- ntp_server: "yes"
+ ntp_type: "server"
+ internal_network: 192.168.56.0

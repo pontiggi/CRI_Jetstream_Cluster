@@ -1,10 +1,13 @@
 ---
  
- - name: disable and stop chronyd
-   service: name=chronyd state=stopped enable=no
-
  - name: make sure ntp is installed
    yum: name=ntp state=present
+
+ - name: ntp server template
+   template: src={{ ntp_type }}_ntp.conf.j2 dest=/etc/ntp.conf
+
+ - name: start and enable ntpd
+   service: name=ntpd state=started enabled=yes
 
 # - name: set submit host as server
 
