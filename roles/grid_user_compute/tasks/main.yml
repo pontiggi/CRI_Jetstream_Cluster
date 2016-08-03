@@ -1,0 +1,17 @@
+---
+ 
+ - name: create the user "grid_user"
+   user:
+     name: grid_user
+     shell: /bin/bash
+     generate_ssh_key: no
+     state: present
+     createhome: yes
+
+ - name: copy key from submit node
+   authorized_key:
+     user: grid_user
+     key: "{{ lookup('file','{{ item }}') }} "
+   with_fileglob:
+     - files/*id_rsa.pub 
+# Yes, that is disgusting, but handles multiple submit nodes!
