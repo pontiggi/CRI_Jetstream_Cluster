@@ -5,7 +5,7 @@
      - xnit
      - grid_user
      - ntp
-#     - torque_server
+     - torque
 #     - Maui_master
 #     - nfs_server
 #      - ssh_gen_grid_user 
