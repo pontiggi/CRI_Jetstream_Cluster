@@ -6,6 +6,12 @@
      - "vim" 
      - "rsync"
      - "libselinux-python"
+     - "gcc"           #torque
+     - "gcc-c++"       #torque
+     - "gcc-gfortran"  #torque
+     - "openssl-devel" #torque
+     - "libxml2-devel" #torque
+     - "boost-devel"   #torque
 #     - "epel-release"
 #     - "wget" 
 #     - "tcpdump"
