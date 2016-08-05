@@ -13,6 +13,16 @@
      command: "./configure" 
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
+   
+   - name: make torque
+     make:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       target: all
+
+   - name: make install torque
+     make:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       target: install
 
 #   - name: populate default torque queue
 #     template:
