@@ -1,0 +1,31 @@
+---
+
+   - name: ensure build dir exists
+     file: path=/root/build/torque state=directory recurse=yes
+
+#   - name: download Torque source
+#     get_url: url=https://www.adaptivecomputing.com/download/torque/torque-6.0.2-1469811694_d9a3483.tar.gz dest=/root/build/torque_src.tar.gz
+
+   - name: unpack source
+     unarchive: src=files/torque_src.tar.gz dest=/root/build
+
+   - name: run configure before make
+     command: "./configure" 
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+   
+   - name: make torque
+     make:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       target: all
+
+   - name: make install torque
+     make:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       target: install
+
+#   - name: populate default torque queue
+#     template:
+
+#   - name: restart pbs_server
+#     service: name=pbs_server state=restarted enabled=yes
