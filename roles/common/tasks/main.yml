@@ -23,6 +23,9 @@
 #     - "firewalld"
 #     - "pciutils"
 #     - "ntp"
-
+# - name: set hostname
+#   hostname: name={{ inventory_hostname }}
+ 
  - name: set up /etc/hosts
    template: src=hosts.j2 dest=/etc/hosts
+

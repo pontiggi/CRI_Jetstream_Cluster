@@ -6,5 +6,5 @@
 {{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['inventory_hostname'] }}
 {% endfor %}
 
-127.0.0.1 {{ hostvars[host]['inventory_hostname'] }} localhost
-::1 {{ hostvars[host]['inventory_hostname'] }} localhost
+127.0.0.1 {{ inventory_hostname }} localhost
+::1 {{ inventory_hostname }} localhost
