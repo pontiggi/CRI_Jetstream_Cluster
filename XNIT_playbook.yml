@@ -1,8 +1,0 @@
----
- - hosts: headnode
-   tasks:
-   - name: install XSEDE yum repo
-     yum: name=http://gw97.iu.xsede.org/xsederepo/xsede-release-0-2.noarch.rpm state=present
-   
-   - name: update
-     shell: "yum -y update --skip-broken"
