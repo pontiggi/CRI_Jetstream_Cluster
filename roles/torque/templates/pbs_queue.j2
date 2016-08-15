@@ -1,0 +1,3 @@
+{% for host in groups['compute_nodes'] %}
+{{ hostvars[host]['inventory_hostname'] }} np={{ hostvars[host]['num_procs'] }}
+{% endfor %}

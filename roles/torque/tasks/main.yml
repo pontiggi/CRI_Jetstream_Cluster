@@ -6,31 +6,31 @@
 #   - name: download Torque source
 #     get_url: url=https://www.adaptivecomputing.com/download/torque/torque-6.0.2-1469811694_d9a3483.tar.gz dest=/root/build/torque_src.tar.gz
 
-   - name: unpack source
-     unarchive: src=files/torque_src.tar.gz dest=/root/build
+#   - name: unpack source
+#     unarchive: src=files/torque_src.tar.gz dest=/root/build
 
-   - name: run configure before make
-     command: "./configure" 
-     args:
-       chdir: "/root/build/torque-{{ torque_version }}"
+#   - name: run configure before make
+#     command: "./configure" 
+#     args:
+#       chdir: "/root/build/torque-{{ torque_version }}"
 
 #need to make a way to skip this!!! argh   
-   - name: make torque
-     make:
-       chdir: "/root/build/torque-{{ torque_version }}"
-       target: all
+#   - name: make torque
+#     make:
+#       chdir: "/root/build/torque-{{ torque_version }}"
+#       target: all
 
-   - name: make install torque
-     make:
-       chdir: "/root/build/torque-{{ torque_version }}"
-       target: install
+#   - name: make install torque
+#     make:
+#       chdir: "/root/build/torque-{{ torque_version }}"
+#       target: install
 
 #verify that /var/spool/torque/server_name has the correct hostname? This works correctly in testing...
 
-   - name: make compute node packages
-     make:
-       chdir: "/root/build/torque-{{ torque_version }}"
-       target: packages
+#   - name: make compute node packages
+#     make:
+#       chdir: "/root/build/torque-{{ torque_version }}"
+#       target: packages
 
    - name: copy trqauthd.service to usr/lib/systemd/system/
      copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
@@ -44,6 +44,9 @@
    - name: enable and start trqauthd.service
      service: name=trqauthd.service enabled=yes state=started
 
+   - name: populate nodes file
+     template: src=pbs_queue.j2 dest=/var/spool/torque/server_priv/nodes
+
    - name: create a default queue
      command: ./torque.setup root
      args:
@@ -55,5 +58,3 @@
    - name: start and enable pbs_server
      service: name=pbs_server.service state=starte enabled=yes
 
-#   - name: populate default torque queue
-#     template:
