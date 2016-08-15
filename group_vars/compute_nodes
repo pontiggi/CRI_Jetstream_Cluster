@@ -1,3 +1,4 @@
 ---
  submit_host: "no"
  ntp_type: "client"
+ num_procs: 1

@@ -13,7 +13,8 @@
      command: "./configure" 
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
-   
+
+#need to make a way to skip this!!! argh   
    - name: make torque
      make:
        chdir: "/root/build/torque-{{ torque_version }}"
@@ -24,8 +25,35 @@
        chdir: "/root/build/torque-{{ torque_version }}"
        target: install
 
+#verify that /var/spool/torque/server_name has the correct hostname? This works correctly in testing...
+
+   - name: make compute node packages
+     make:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       target: packages
+
+   - name: copy trqauthd.service to usr/lib/systemd/system/
+     copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
+
+   - name: create torque.conf in /etc/ld.so.conf.d/
+     lineinfile: dest=/etc/ld.so.conf.d/torque.conf state=present line='/usr/local/lib' create=yes
+
+   - name: run ldconfig
+     command: ldconfig
+
+   - name: enable and start trqauthd.service
+     service: name=trqauthd.service enabled=yes state=started
+
+   - name: create a default queue
+     command: ./torque.setup root
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+
+   - name: copy pbs_server.service to usr/lib/systemd/system/
+     copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/pbs_server.service" dest="/usr/lib/systemd/system/" remote_src=True
+
+   - name: start and enable pbs_server
+     service: name=pbs_server.service state=starte enabled=yes
+
 #   - name: populate default torque queue
 #     template:
-
-#   - name: restart pbs_server
-#     service: name=pbs_server state=restarted enabled=yes
