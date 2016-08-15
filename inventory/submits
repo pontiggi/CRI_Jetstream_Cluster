@@ -1,2 +1,2 @@
 [submit_nodes]
-192.168.56.99 ansible_connection=ssh
+headnode ansible_host=192.168.56.99 ansible_connection=ssh
