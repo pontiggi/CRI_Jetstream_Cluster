@@ -1,28 +1,33 @@
 ---
  
- - name: install common packages
+# - name: configure yum proxy on compute nodes
+#   when: submit_host == "no"
+
+ - name: install common packages (submit)
    yum: name={{ item }} state=latest
    with_items:
      - "vim" 
      - "rsync"
      - "libselinux-python"
-     - "gcc"           #torque
-     - "gcc-c++"       #torque
-     - "gcc-gfortran"  #torque
-     - "openssl-devel" #torque
-     - "libxml2-devel" #torque
-     - "boost-devel"   #torque
-#     - "epel-release"
-#     - "wget" 
-#     - "tcpdump"
-#     - "whois" 
-#     - "lsof" 
-#     - "xinetd"
-#     - "net-tools"
+     - "epel-release"
+#     - "openmpi"       #torque
+#     - "gcc"           #torque
+#     - "gcc-c++"       #torque
+#     - "gcc-gfortran"  #torque
+#     - "openssl-devel" #torque
+#     - "libxml2-devel" #torque
+#     - "boost-devel"   #torque
 #     - "exportfs" 
 #     - "firewalld"
-#     - "pciutils"
-#     - "ntp"
+
+ - name: install tinyproxy
+   yum: name=tinyproxy state=present
+   when: submit_host == "yes"
+
+# - name: configure tinyproxy on head node
+#   template: name=
+#   when: submit_host == "yes"
+
 # - name: set hostname
 #   hostname: name={{ inventory_hostname }}
  
