@@ -1,14 +1,34 @@
 ---
  
-# - name: configure yum proxy on compute nodes
-#   when: submit_host == "no"
+ - name: install libselinux-python packages (submit)
+   yum: name=libselinux-python state=latest
+   when: submit_host == "yes"
 
- - name: install common packages (submit)
+ - name: install libselinux-python packages (compute)
+   yum: name=libselinux-python state=latest
+   environment:
+     http_proxy: "https://{% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}:1375"
+   when: submit_host == "no"
+
+ - name: set up /etc/hosts
+   template: src=hosts.j2 dest=/etc/hosts
+
+ - name: set hostname
+   hostname: name={{ inventory_hostname }}
+ 
+ - name: configure yum proxy on compute nodes
+   lineinfile:
+     dest: "/etc/yum.conf"
+     insertafter: EOF
+     line: "{% for host in groups['submit_nodes'] %}proxy = https://{{ hostvars[host]['inventory_hostname'] }}:1375 
+            {% endfor %}"
+   when: submit_host == "no"
+
+ - name: install common packages
    yum: name={{ item }} state=latest
    with_items:
      - "vim" 
      - "rsync"
-     - "libselinux-python"
      - "epel-release"
 #     - "openmpi"       #torque
 #     - "gcc"           #torque
@@ -24,13 +44,11 @@
    yum: name=tinyproxy state=present
    when: submit_host == "yes"
 
-# - name: configure tinyproxy on head node
-#   template: name=
-#   when: submit_host == "yes"
+ - name: configure tinyproxy on head node
+   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
+   when: submit_host == "yes"
 
-# - name: set hostname
-#   hostname: name={{ inventory_hostname }}
- 
- - name: set up /etc/hosts
-   template: src=hosts.j2 dest=/etc/hosts
+ - name: start tinyproxy
+   service: name=tinyproxy state=restarted enabled=yes
+   when: submit_host == "yes"
 
