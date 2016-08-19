@@ -5,7 +5,8 @@ Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
  ARGH SELINUX - restorecon on authorized_keys
 
 Need to enable yum tunnel for computes? NOT NOW
- - JUST GIVE PUBLIC ETHERNET TO ERRYTHING
+ - working on this; yum.conf works for non-epel right now
+ -- why failing for epel?
 
 Hostname setup:
  need hostname in /etc/hosts
