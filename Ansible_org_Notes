@@ -1,35 +1,10 @@
 Use some Roles
  - Submit nodes, and compute nodes - allows for scaling if necessary
 
-Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
- ARGH SELINUX - restorecon on authorized_keys
-
-Need to enable yum tunnel for computes? NOT NOW
- - working on this; yum.conf works for non-epel right now
- -- why failing for epel? Some problem with https; upgrading/updating
- doesn't help (including ca-certificates and nss*)! 
- but removing the 's' in etc/yum.repos.d/epel.repo does 
- :( This seems like a stupid fix.
-
-Hostname setup:
- need hostname in /etc/hosts
- uggh
-
-THERE ARE FOUR THINGS NEEDED:
-grid_user
- - add user on submit host
- - generate ssh key on host
- - copy pub key back to local machine
- - deploy user on compute host
- - add key to auth keys on computes
-ntp
-torque (not maui; only ONE queue)
- - TODO:
-   open firewall ports (in common?)
-   finish install!
-   make client packages on headnode
-   - just MOMs
-mpi 
+TODO:
+ fix ssh key handling for grid_user
+ figure out why pbs_sched not scheduling jobs
+ -- or switch to Maui..
 
 Directory Layout:
 
