@@ -1,39 +1,40 @@
 ---
 
+#thought about splitting this into two yml files... but requires a restart of pbs_server
+# on the headnode *after* pbs_mom is running on computes... so no.
+
    - name: ensure dependencies installed
      yum: name={{ item }} state=present
      with_items:
-       - "gcc"           #torque
-       - "gcc-c++"       #torque
-       - "gcc-gfortran"  #torque
-       - "openssl-devel" #torque
-       - "libxml2-devel" #torque
-       - "boost-devel"   #torque
-       - "epel-release" #torque
 
    - name: ensure build dir exists
      file: path=/root/build/torque state=directory recurse=yes
+     when: submit_host == "yes"
 
    - name: unpack source
      unarchive: src=files/torque_src.tar.gz dest=/root/build
+     when: submit_host == "yes"
 
    - name: run configure before make
      command: "./configure" 
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/root/build/torque-{{ torque_version }}/Makefile"
+     when: submit_host == "yes"
 
    - name: make torque
      command: "make all"
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/root/build/torque-{{ torque_version }}/src/cmds/pbsnodes"
+     when: submit_host == "yes"
 
    - name: make install torque
      command: "make install"
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/var/spool/torque/server_name"
+     when: submit_host == "yes"
 
 #verify that /var/spool/torque/server_name has the correct hostname? This works correctly in testing...
 
@@ -42,24 +43,41 @@
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/root/build/torque-{{ torque_version }}/torque-package-mom-linux-x86_64.sh"
+     when: submit_host == "yes"
+
+   - name: copy compute packages back to management machine
+     synchronize:
+       mode: pull
+       use_ssh_args: yes
+       src: "/root/build/torque-{{ torque_version }}/{{ item }}"
+       dest: roles/torque/files/
+     with_items:
+       - "torque-package-mom-linux-x86_64.sh"
+       - "torque-package-clients-linux-x86_64.sh"
+       - "contrib/systemd/pbs_mom.service"
+     when: submit_host == "yes"
 
    - name: copy trqauthd.service to usr/lib/systemd/system/
      copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
+     when: submit_host == "yes"
 
    - name: create torque.conf in /etc/ld.so.conf.d/
      lineinfile: dest=/etc/ld.so.conf.d/torque.conf state=present line='/usr/local/lib' create=yes
+     when: submit_host == "yes"
 
    - name: run ldconfig
      command: ldconfig
+     when: submit_host == "yes"
 
-   - name: enable and start munge
+   - name: enable and start trqauthd
      service: name=trqauthd.service enabled=yes state=started
+     when: submit_host == "yes"
 
    - name: create munge key
      command: create-munge-key
      when: submit_host == "yes"
 
-   - name: copy key back to management machine
+   - name: copy munge key back to management machine
      synchronize:
        mode: pull
        use_ssh_args: yes
@@ -67,20 +85,14 @@
        dest: roles/torque/files/munge.key
      when: submit_host == "yes"
 
-   - name: copy munge key from submit node
-     synchronize:
-       mode: push
-       src: files/munge.key
-       dest: /etc/munge/munge.key
-     with_fileglob:
-       - files/*munge.key
-     when: submit_host == "no"
-
    - name: enable and start trqauthd.service
      service: name=trqauthd.service enabled=yes state=started
+     when: submit_host == "yes"
 
-   - name: populate nodes file
-     template: src=pbs_queue.j2 dest=/var/spool/torque/server_priv/nodes
+   - name: run qterm just in case
+     command: "qterm"
+     ignore_errors: yes
+     when: submit_host == "yes"
 
    - name: run initial setup
      expect:
@@ -88,10 +100,67 @@
        chdir: "/root/build/torque-{{ torque_version }}"
        responses:
          (?i)do you wish to continue: "y"
+     when: submit_host == "yes"
+
+   - name: populate nodes file
+     template: src=pbs_queue.j2 dest=/var/spool/torque/server_priv/nodes
+     when: submit_host == "yes"
 
    - name: copy pbs_server.service to usr/lib/systemd/system/
      copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/pbs_server.service" dest="/usr/lib/systemd/system/" remote_src=True
+     when: submit_host == "yes"
 
-   - name: start and enable pbs_server
-     service: name=pbs_server.service state=started enabled=yes
+   - name: copy mom and client packages to compute nodes
+     synchronize:
+       mode: push
+       use_ssh_args: yes
+       src: files/{{ item }}
+       dest: "/root/{{ item }}"
+     when: submit_host == "no"
+     with_items:
+       - "torque-package-mom-linux-x86_64.sh"
+       - "torque-package-clients-linux-x86_64.sh"
+       - "pbs_mom.service"
+
+   - name: copy munge key from submit node
+     synchronize:
+       mode: push
+       src: files/munge.key
+       dest: /etc/munge/munge.key
+     when: submit_host == "no"
+     with_fileglob:
+       - files/*munge.key
+
+   - name: install mom package on compute nodes
+     command: "./torque-package-mom-linux-x86_64.sh --install"
+     when: submit_host == "no"
+
+   - name: install clients package on compute nodes
+     command: "./torque-package-clients-linux-x86_64.sh --install"
+     when: submit_host == "no"
+
+   - name: copy pbs_mom.service to usr/lib/systemd/system/
+     copy: src="/root/pbs_mom.service" dest="/usr/lib/systemd/system/" remote_src=True
+     when: submit_host == "no"
+
+   - name: create torque.conf in /etc/ld.so.conf.d/
+     lineinfile: dest=/etc/ld.so.conf.d/torque.conf state=present line='/usr/local/lib' create=yes
+     when: submit_host == "no"
+
+   - name: run ldconfig
+     command: ldconfig
+     when: submit_host == "no"
+
+   - name: start pbs_mom on compute nodes
+     service: name=pbs_mom state=started enabled=yes
+     when: submit_host == "no"
+
+   - name: clear pbs_server on frontend
+     command: "qterm -t quick"
+     ignore_errors: yes
+     when: submit_host == "yes"
+
+   - name: restart pbs_mom on submit nodes
+     service: name=pbs_mom state=restarted enabled=yes
+     when: submit_host == "yes"
 
