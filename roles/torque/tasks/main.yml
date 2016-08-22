@@ -154,13 +154,3 @@
    - name: start pbs_mom on compute nodes
      service: name=pbs_mom state=started enabled=yes
      when: submit_host == "no"
-
-   - name: clear pbs_server on frontend
-     command: "qterm -t quick"
-     ignore_errors: yes
-     when: submit_host == "yes"
-
-   - name: restart pbs_server on submit nodes
-     service: name=pbs_server state=restarted enabled=yes
-     when: submit_host == "yes"
-
