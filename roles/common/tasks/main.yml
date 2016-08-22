@@ -7,7 +7,7 @@
  - name: install libselinux-python packages (compute)
    yum: name=libselinux-python state=latest
    environment:
-     http_proxy: "https://{% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}:1375"
+     http_proxy: "http://{% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}:1375"
    when: submit_host == "no"
 
  - name: set up /etc/hosts
@@ -20,7 +20,7 @@
    lineinfile:
      dest: "/etc/yum.conf"
      insertafter: EOF
-     line: "{% for host in groups['submit_nodes'] %}proxy = https://{{ hostvars[host]['inventory_hostname'] }}:1375 
+     line: "{% for host in groups['submit_nodes'] %}proxy = http://{{ hostvars[host]['inventory_hostname'] }}:1375 
             {% endfor %}"
    when: submit_host == "no"
 

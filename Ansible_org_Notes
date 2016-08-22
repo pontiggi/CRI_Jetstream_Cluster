@@ -1,4 +1,4 @@
-Use some damn Roles
+Use some Roles
  - Submit nodes, and compute nodes - allows for scaling if necessary
 
 Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
@@ -6,7 +6,10 @@ Ugh - ssh key setup must be done either initial w/ password, or prior to ansible
 
 Need to enable yum tunnel for computes? NOT NOW
  - working on this; yum.conf works for non-epel right now
- -- why failing for epel?
+ -- why failing for epel? Some problem with https; upgrading/updating
+ doesn't help (including ca-certificates and nss*)! 
+ but removing the 's' in etc/yum.repos.d/epel.repo does 
+ :( This seems like a stupid fix.
 
 Hostname setup:
  need hostname in /etc/hosts
@@ -27,8 +30,6 @@ torque (not maui; only ONE queue)
    make client packages on headnode
    - just MOMs
 mpi 
-
-NOTHING ELSE FOR NOW, ID10T
 
 Directory Layout:
 
