@@ -5,7 +5,7 @@
     - xnit
     - grid_user
     - ntp
-#    - torque_client
+    - torque
 #    - nfs_client
 #    - ganglia_client
 #    - common

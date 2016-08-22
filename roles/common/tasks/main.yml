@@ -32,18 +32,22 @@
      - "epel-release"
      - "pexpect"
      - "python-pip"
-#     - "openmpi"       #torque
-#     - "gcc"           #torque
-#     - "gcc-c++"       #torque
-#     - "gcc-gfortran"  #torque
-#     - "openssl-devel" #torque
-#     - "libxml2-devel" #torque
-#     - "boost-devel"   #torque
+     - "munge"
+     - "munge-devel"
+     - "openmpi"       #torque
+     - "openmpi-devel"       #torque
+     - "gcc"           
+     - "gcc-c++"       
+     - "gcc-gfortran"  
+     - "openssl-devel" 
+     - "libxml2-devel" 
+     - "boost-devel"   
 #     - "exportfs" 
 #     - "firewalld"
  
  - name: install pexpect from pip
    pip: name=pexpect version=3.3
+   when: submit_host == "yes"
 
  - name: fix epel repo
    lineinfile: 
