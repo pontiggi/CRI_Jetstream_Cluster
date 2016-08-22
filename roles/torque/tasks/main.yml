@@ -3,10 +3,6 @@
 #thought about splitting this into two yml files... but requires a restart of pbs_server
 # on the headnode *after* pbs_mom is running on computes... so no.
 
-   - name: ensure dependencies installed
-     yum: name={{ item }} state=present
-     with_items:
-
    - name: ensure build dir exists
      file: path=/root/build/torque state=directory recurse=yes
      when: submit_host == "yes"
@@ -59,6 +55,10 @@
 
    - name: copy trqauthd.service to usr/lib/systemd/system/
      copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
+     when: submit_host == "yes"
+
+   - name: copy pbs_sched.service to usr/lib/systemd/system/
+     copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/pbs_sched.service" dest="/usr/lib/systemd/system/" remote_src=True
      when: submit_host == "yes"
 
    - name: create torque.conf in /etc/ld.so.conf.d/
