@@ -30,6 +30,8 @@
      - "vim" 
      - "rsync"
      - "epel-release"
+     - "pexpect"
+     - "python-pip"
 #     - "openmpi"       #torque
 #     - "gcc"           #torque
 #     - "gcc-c++"       #torque
@@ -39,6 +41,15 @@
 #     - "boost-devel"   #torque
 #     - "exportfs" 
 #     - "firewalld"
+ 
+ - name: install pexpect from pip
+   pip: name=pexpect version=3.3
+
+ - name: fix epel repo
+   lineinfile: 
+     dest: "/etc/yum.repos.d/epel.repo"
+     regexp: "mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
+     line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
 
  - name: install tinyproxy
    yum: name=tinyproxy state=present

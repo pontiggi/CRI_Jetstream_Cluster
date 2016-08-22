@@ -1,89 +1,97 @@
 ---
-  
-  - name: ensure epel-release installed
-    yum: name={{ item }} state=present
-    with_items:
-      - "gcc"           #torque
-      - "gcc-c++"       #torque
-      - "gcc-gfortran"  #torque
-      - "openssl-devel" #torque
-      - "libxml2-devel" #torque
-      - "boost-devel"   #torque
-      - "epel-release" #torque
-      - "openmpi"
 
-  - name: install torque server and dependencies
-    yum: name={{ item }} state=present
-    with_items:
-      - "torque"
-      - "torque-server"
-      - "torque-devel"
-      - "torque-scheduler"
-      - "torque-libs"
-      - "torque-client"
-      - "torque-docs"
-      - "munge"
-      - "munge-libs"
-    when: submit_host == "yes"
+   - name: ensure dependencies installed
+     yum: name={{ item }} state=present
+     with_items:
+       - "gcc"           #torque
+       - "gcc-c++"       #torque
+       - "gcc-gfortran"  #torque
+       - "openssl-devel" #torque
+       - "libxml2-devel" #torque
+       - "boost-devel"   #torque
+       - "epel-release" #torque
 
-  - name: install torque mom and dependencies
-    yum: name={{ item }} state=present
-    with_items:
-      - "torque"
-      - "torque-mom"
-      - "torque-libs"
-      - "munge"
-      - "munge-libs"
-    when: submit_host == "no"
+   - name: ensure build dir exists
+     file: path=/root/build/torque state=directory recurse=yes
 
+   - name: unpack source
+     unarchive: src=files/torque_src.tar.gz dest=/root/build
 
-  - name: create torque.conf in /etc/ld.so.conf.d/
-    lineinfile: dest=/etc/ld.so.conf.d/torque.conf state=present line='/usr/local/lib' create=yes
+   - name: run configure before make
+     command: "./configure" 
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       creates: "/root/build/torque-{{ torque_version }}/Makefile"
 
-  - name: run ldconfig
-    command: ldconfig
- 
-  - name: create munge key
-    command: create-munge-key
-    when: submit_host == "yes"
+   - name: make torque
+     command: "make all"
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       creates: "/root/build/torque-{{ torque_version }}/src/cmds/pbsnodes"
 
-# THIS WILL CURRENTLY BREAK WITH MULTIPLE SUBMIT NODES!!!
-  - name: copy key back to management machine
-    synchronize:
-      mode: pull
-      use_ssh_args: yes
-      src: /etc/munge/munge.key
-      dest: roles/torque/files/munge.key
-    when: submit_host == "yes"
+   - name: make install torque
+     command: "make install"
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       creates: "/var/spool/torque/server_name"
 
-  - name: copy munge key from submit node
-    synchronize:
-      mode: push
-      src: files/munge.key
-      dest: /etc/munge/munge.key
-    with_fileglob:
-      - files/*munge.key
-    when: submit_host == "no"
-    
-  - name: start and enable munge.service
-    service: name=munge.service enabled=yes state=started
- 
-  - name: start and enable trqauthd.service
-    service: name=trqauthd.service enabled=yes state=started
- 
-  - name: populate nodes file
-    template: src=pbs_queue.j2 dest=/var/lib/torque/server_priv/nodes
-    when: submit_host == "yes"
+#verify that /var/spool/torque/server_name has the correct hostname? This works correctly in testing...
 
-#   - name: create a default queue
-#     command: torque.setup root
-#     args:
-#       chdir: "/root/build/torque-{{ torque_version }}"
+   - name: make compute node packages
+     command: "make packages"
+     args:
+       chdir: "/root/build/torque-{{ torque_version }}"
+       creates: "/root/build/torque-{{ torque_version }}/torque-package-mom-linux-x86_64.sh"
 
-  - name: start and enable pbs_server
-    service: name=pbs_server.service state=started enabled=yes
-    when: submit_host == "yes"
+   - name: copy trqauthd.service to usr/lib/systemd/system/
+     copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
 
-  - name: start and enable pbs_mom
-    service: name=pbs_mom.service state=started enabled=yes
-    when: submit_host == "no"
+   - name: create torque.conf in /etc/ld.so.conf.d/
+     lineinfile: dest=/etc/ld.so.conf.d/torque.conf state=present line='/usr/local/lib' create=yes
+
+   - name: run ldconfig
+     command: ldconfig
+
+   - name: enable and start munge
+     service: name=trqauthd.service enabled=yes state=started
+
+   - name: create munge key
+     command: create-munge-key
+     when: submit_host == "yes"
+
+   - name: copy key back to management machine
+     synchronize:
+       mode: pull
+       use_ssh_args: yes
+       src: /etc/munge/munge.key
+       dest: roles/torque/files/munge.key
+     when: submit_host == "yes"
+
+   - name: copy munge key from submit node
+     synchronize:
+       mode: push
+       src: files/munge.key
+       dest: /etc/munge/munge.key
+     with_fileglob:
+       - files/*munge.key
+     when: submit_host == "no"
+
+   - name: enable and start trqauthd.service
+     service: name=trqauthd.service enabled=yes state=started
+
+   - name: populate nodes file
+     template: src=pbs_queue.j2 dest=/var/spool/torque/server_priv/nodes
+
+   - name: run initial setup
+     expect:
+       command: ./torque.setup root
+       chdir: "/root/build/torque-{{ torque_version }}"
+       responses:
+         (?i)do you wish to continue: "y"
+
+   - name: copy pbs_server.service to usr/lib/systemd/system/
+     copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/pbs_server.service" dest="/usr/lib/systemd/system/" remote_src=True
+
+   - name: start and enable pbs_server
+     service: name=pbs_server.service state=started enabled=yes
+
