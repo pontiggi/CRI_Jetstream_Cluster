@@ -110,6 +110,13 @@
      copy: src="/root/build/torque-{{ torque_version }}/contrib/systemd/pbs_server.service" dest="/usr/lib/systemd/system/" remote_src=True
      when: submit_host == "yes"
 
+   - name: start pbs_server and pbs_sched on submit nodes
+     service: name=pbs_{{ item }} state=started enabled=yes
+     with_items:
+       - "server"
+       - "sched"
+     when: submit_host == "yes"
+
    - name: copy mom and client packages to compute nodes
      synchronize:
        mode: push
