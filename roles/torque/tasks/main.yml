@@ -160,7 +160,7 @@
      ignore_errors: yes
      when: submit_host == "yes"
 
-   - name: restart pbs_mom on submit nodes
-     service: name=pbs_mom state=restarted enabled=yes
+   - name: restart pbs_server on submit nodes
+     service: name=pbs_server state=restarted enabled=yes
      when: submit_host == "yes"
 
