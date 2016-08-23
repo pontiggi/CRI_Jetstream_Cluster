@@ -5,7 +5,7 @@
    when: submit_host == "yes"
 
  - name: install libselinux-python packages (compute)
-   yum: name=libselinux-python state=latest
+   yum: name=libselinux-python state=present
    environment:
      http_proxy: "http://{% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}:1375"
    when: submit_host == "no"
@@ -25,15 +25,11 @@
    when: submit_host == "no"
 
  - name: install common packages
-   yum: name={{ item }} state=latest
+   yum: name={{ item }} state=present
    with_items:
      - "vim" 
      - "rsync"
      - "epel-release"
-     - "pexpect"
-     - "python-pip"
-     - "munge"
-     - "munge-devel"
      - "openmpi"       #torque
      - "openmpi-devel"       #torque
      - "gcc"           
@@ -44,16 +40,27 @@
      - "boost-devel"   
 #     - "exportfs" 
 #     - "firewalld"
+
+ - name: fix broken http for epel on compute nodes
+   lineinfile: 
+     dest: "/etc/yum.repos.d/epel.repo"
+     regexp: "mirrorlist\\=https\\:\\/\\/mirrors\\.fedoraproject\\.org\\/metalink\\?repo\\=epel\\-7\\&arch\\=\\$basearch"
+     line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
+   when: submit_host == "no"
+
+#     regexp: "mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
  
+ - name: install stuff from epel
+   yum: name={{ item }} state=latest
+   with_items:
+     - "python-pip"
+     - "munge" # doesn't work with torque currently... even w/ --enable-munge-auth 
+     - "munge-devel"
+     - "munge-libs"
+
  - name: install pexpect from pip
    pip: name=pexpect version=3.3
    when: submit_host == "yes"
-
- - name: fix epel repo
-   lineinfile: 
-     dest: "/etc/yum.repos.d/epel.repo"
-     regexp: "mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
-     line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
 
  - name: install tinyproxy
    yum: name=tinyproxy state=present
