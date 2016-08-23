@@ -1,0 +1,5 @@
+---
+ - hosts: submit_nodes
+   roles:
+     - ssh_keys
+     - torque_restart

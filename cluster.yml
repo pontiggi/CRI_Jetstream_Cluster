@@ -1,3 +1,4 @@
 ---
  - include: submit_nodes.yml
  - include: compute_nodes.yml
+ - include: cleanup_tasks.yml
