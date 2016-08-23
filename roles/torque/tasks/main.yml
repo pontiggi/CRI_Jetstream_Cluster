@@ -3,6 +3,22 @@
 #thought about splitting this into two yml files... but requires a restart of pbs_server
 # on the headnode *after* pbs_mom is running on computes... so no.
 
+#   - name: create munge key # MUNGE DOESN'T WORK AS INSTALLED FROM THE REPO... 
+#     command: create-munge-key
+#     when: submit_host == "yes"
+
+#   - name: copy munge key back to management machine
+#     synchronize:
+#       mode: pull
+#       use_ssh_args: yes
+#       src: /etc/munge/munge.key
+#       dest: roles/torque/files/munge.key
+#     when: submit_host == "yes"
+
+#   - name: enable and start munge
+#     service: name=munge.service enabled=yes state=started
+#     when: submit_host == "yes"
+
    - name: ensure build dir exists
      file: path=/root/build/torque state=directory recurse=yes
      when: submit_host == "yes"
@@ -12,7 +28,7 @@
      when: submit_host == "yes"
 
    - name: run configure before make
-     command: "./configure --enable-munge-auth" 
+     command: "./configure"  # -- configure-munge-auth
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/root/build/torque-{{ torque_version }}/Makefile"
@@ -73,22 +89,6 @@
      service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
 
-   - name: create munge key
-     command: create-munge-key
-     when: submit_host == "yes"
-
-   - name: copy munge key back to management machine
-     synchronize:
-       mode: pull
-       use_ssh_args: yes
-       src: /etc/munge/munge.key
-       dest: roles/torque/files/munge.key
-     when: submit_host == "yes"
-
-   - name: enable and start munge
-     service: name=munge.service enabled=yes state=started
-     when: submit_host == "yes"
-
    - name: enable and start trqauthd.service
      service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
@@ -133,18 +133,18 @@
        - "torque-package-clients-linux-x86_64.sh"
        - "pbs_mom.service"
 
-   - name: copy munge key from submit node
-     synchronize:
-       mode: push
-       src: files/munge.key
-       dest: /etc/munge/munge.key
-     when: submit_host == "no"
-     with_fileglob:
-       - files/*munge.key
+#   - name: copy munge key from submit node
+#     synchronize:
+#       mode: push
+#       src: files/munge.key
+#       dest: /etc/munge/munge.key
+#     when: submit_host == "no"
+#     with_fileglob:
+#       - files/*munge.key
 
-   - name: enable and start munge
-     service: name=munge.service enabled=yes state=started
-     when: submit_host == "no"
+#   - name: enable and start munge
+#     service: name=munge.service enabled=yes state=started
+#     when: submit_host == "no"
 
    - name: install mom package on compute nodes
      command: "./torque-package-mom-linux-x86_64.sh --install"

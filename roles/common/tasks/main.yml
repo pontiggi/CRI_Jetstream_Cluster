@@ -48,8 +48,6 @@
      line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
    when: submit_host == "no"
 
-#     regexp: "mirrorlist=https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
- 
  - name: install stuff from epel
    yum: name={{ item }} state=latest
    with_items:
