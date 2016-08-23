@@ -1,0 +1,7 @@
+---
+
+ - name: kill the queue
+   command: "qterm -t quick"
+
+ - name: restart pbs_server
+   service: name=pbs_server state=restarted enabled=yes
