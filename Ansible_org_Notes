@@ -2,7 +2,6 @@ Use some Roles
  - Submit nodes, and compute nodes - allows for scaling if necessary
 
 TODO:
- fix ssh key handling for grid_user
  figure out why pbs_sched not scheduling jobs
  -- or switch to Maui..
 
