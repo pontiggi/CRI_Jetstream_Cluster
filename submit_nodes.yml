@@ -3,9 +3,10 @@
    roles:
      - common
      - xnit
-     - grid_user
+     - {role: grid_user, cleanup: "no"}
      - ntp
      - torque
+#     - grid_user
 #     - Maui_master
 #     - nfs_server
 #      - ssh_gen_grid_user 

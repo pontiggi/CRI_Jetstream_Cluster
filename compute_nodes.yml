@@ -1,11 +1,11 @@
 ---
-- hosts: compute_nodes
-  roles:
-    - common
-    - xnit
-    - grid_user
-    - ntp
-    - torque
+ - hosts: compute_nodes
+   roles:
+     - common
+     - xnit
+     - {role: grid_user, cleanup: "no"}
+     - ntp
+     - torque
 #    - nfs_client
 #    - ganglia_client
 #    - common

@@ -1,5 +1,8 @@
 ---
+ - hosts: all
+   roles:
+   - {role: grid_user, cleanup: "yes"}
+
  - hosts: submit_nodes
    roles:
-     - ssh_keys
      - torque_restart
