@@ -38,6 +38,8 @@
      - "openssl-devel" 
      - "libxml2-devel" 
      - "boost-devel"   
+     - "net-tools"
+     - "strace"
 #     - "exportfs" 
 #     - "firewalld"
 
