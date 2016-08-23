@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -l walltime=00:1:00
+#PBS -l nodes=2:ppn=1
+#PBS -q batch
+#PBS -j oe
+#PBS -o nodes.out
+
+cd $PBS_WORKDIR
+
+echo "Machinefile: "
+
+cat $PBS_NODEFILE
+
+echo -e "\nNode Query: "
+
+mpirun --machinefile $PBS_NODEFILE hostname
+
