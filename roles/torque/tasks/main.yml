@@ -12,7 +12,7 @@
      when: submit_host == "yes"
 
    - name: run configure before make
-     command: "./configure" 
+     command: "./configure --enable-munge-auth" 
      args:
        chdir: "/root/build/torque-{{ torque_version }}"
        creates: "/root/build/torque-{{ torque_version }}/Makefile"
@@ -85,6 +85,10 @@
        dest: roles/torque/files/munge.key
      when: submit_host == "yes"
 
+   - name: enable and start munge
+     service: name=munge.service enabled=yes state=started
+     when: submit_host == "yes"
+
    - name: enable and start trqauthd.service
      service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
@@ -137,6 +141,10 @@
      when: submit_host == "no"
      with_fileglob:
        - files/*munge.key
+
+   - name: enable and start munge
+     service: name=munge.service enabled=yes state=started
+     when: submit_host == "no"
 
    - name: install mom package on compute nodes
      command: "./torque-package-mom-linux-x86_64.sh --install"
