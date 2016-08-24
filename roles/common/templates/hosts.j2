@@ -1,3 +1,5 @@
+127.0.0.1 {{ inventory_hostname }} localhost
+
 {% for host in groups['submit_nodes'] %}
 {{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['inventory_hostname'] }}
 {% endfor %}
@@ -6,5 +8,4 @@
 {{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['inventory_hostname'] }}
 {% endfor %}
 
-127.0.0.1 {{ inventory_hostname }} localhost
 ::1 {{ inventory_hostname }} localhost
