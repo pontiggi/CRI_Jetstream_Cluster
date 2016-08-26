@@ -1,76 +1,42 @@
 ---
  
- - name: install libselinux-python packages (submit)
-   yum: name=libselinux-python state=latest
-   when: submit_host == "yes"
-
- - name: install libselinux-python packages (compute)
+ - name: install libselinux-python packages
    yum: name=libselinux-python state=present
-   environment:
-     http_proxy: "http://{% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}:1375"
-   when: submit_host == "no"
 
  - name: set up /etc/hosts
    template: src=hosts.j2 dest=/etc/hosts
 
  - name: set hostname
    hostname: name={{ inventory_hostname }}
- 
- - name: configure yum proxy on compute nodes
+
+ - name: turn off requiretty for sudo
    lineinfile:
-     dest: "/etc/yum.conf"
-     insertafter: EOF
-     line: "{% for host in groups['submit_nodes'] %}proxy = http://{{ hostvars[host]['inventory_hostname'] }}:1375 
-            {% endfor %}"
-   when: submit_host == "no"
+     dest: /etc/sudoers
+     regexp: "Defaults    requiretty"
+     line:  "Defaults    !requiretty"
 
- - name: install common packages
-   yum: name={{ item }} state=present
-   with_items:
-     - "vim" 
-     - "rsync"
-     - "epel-release"
-     - "openmpi"       #torque
-     - "openmpi-devel"       #torque
-     - "gcc"           
-     - "gcc-c++"       
-     - "gcc-gfortran"  
-     - "openssl-devel" 
-     - "libxml2-devel" 
-     - "boost-devel"   
-     - "net-tools"
-     - "strace"
-#     - "exportfs" 
-#     - "firewalld"
-
- - name: fix broken http for epel on compute nodes
-   lineinfile: 
-     dest: "/etc/yum.repos.d/epel.repo"
-     regexp: "mirrorlist\\=https\\:\\/\\/mirrors\\.fedoraproject\\.org\\/metalink\\?repo\\=epel\\-7\\&arch\\=\\$basearch"
-     line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
-   when: submit_host == "no"
-
- - name: install stuff from epel
-   yum: name={{ item }} state=latest
-   with_items:
-     - "python-pip"
-     - "munge" # doesn't work with torque currently... even w/ --enable-munge-auth 
-     - "munge-devel"
-     - "munge-libs"
+# this is done in heat now 
+# - name: install common packages
+#   yum: name={{ item }} state=present
+#   with_items:
+#     - "vim" 
+#     - "rsync"
+#     - "epel-release"
+#     - "openmpi"     
+#     - "openmpi-devel"       
+#     - "gcc"           
+#     - "gcc-c++"       
+#     - "gcc-gfortran"  
+#     - "openssl-devel" 
+#     - "libxml2-devel"  #not installed in heat
+#     - "boost-devel"    #not installed  in heat
+#     - "net-tools"
+#     - "strace"
+#     - "python-pip"
+#     - "munge"          #not installed in heat
+#     - "munge-devel"    #not installed in heat
+#     - "munge-libs"     # not installed  in heat
 
  - name: install pexpect from pip
    pip: name=pexpect version=3.3
    when: submit_host == "yes"
-
- - name: install tinyproxy
-   yum: name=tinyproxy state=present
-   when: submit_host == "yes"
-
- - name: configure tinyproxy on head node
-   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
-   when: submit_host == "yes"
-
- - name: start tinyproxy
-   service: name=tinyproxy state=restarted enabled=yes
-   when: submit_host == "yes"
-
