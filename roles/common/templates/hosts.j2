@@ -1,5 +1,7 @@
 127.0.0.1 {{ inventory_hostname }} localhost
 
+10.0.0.4 {{ inventory_hostname }} {{ inventory_hostname }}.jetstreamlocal
+
 {% for host in groups['submit_nodes'] %}
 {{ hostvars[host]['ansible_host'] }} {{ hostvars[host]['inventory_hostname'] }}
 {% endfor %}
