@@ -1,3 +1,9 @@
 [compute_nodes]
+compute-0 ansible_connection=ssh ansible_host=10.0.0.6 ansible_user=centos ansible_become=true become_method=sudo 
+compute-1 ansible_connection=ssh ansible_host=10.0.0.5 ansible_user=centos ansible_become=true become_method=sudo 
+compute-2 ansible_connection=ssh ansible_host=10.0.0.8 ansible_user=centos ansible_become=true become_method=sudo 
+compute-3 ansible_connection=ssh ansible_host=10.0.0.7 ansible_user=centos ansible_become=true become_method=sudo 
+
+[local_compute_nodes]
 compute01 ansible_connection=ssh ansible_host=192.168.56.101
 compute02 ansible_connection=ssh ansible_host=192.168.56.102
