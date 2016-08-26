@@ -15,27 +15,23 @@
      regexp: "Defaults    requiretty"
      line:  "Defaults    !requiretty"
 
-# this is done in heat now 
-# - name: install common packages
-#   yum: name={{ item }} state=present
-#   with_items:
-#     - "vim" 
-#     - "rsync"
-#     - "epel-release"
-#     - "openmpi"     
-#     - "openmpi-devel"       
+ - name: install common packages
+   yum: name={{ item }} state=present
+   with_items:
+     - "boost-devel"    
+     - "net-tools"
+     - "strace"
+     - "python-pip"
+     - "vim" 
+     - "rsync"
+     - "epel-release"
+     - "openmpi"     
+     - "openmpi-devel"       
 #     - "gcc"           
 #     - "gcc-c++"       
 #     - "gcc-gfortran"  
 #     - "openssl-devel" 
 #     - "libxml2-devel"  #not installed in heat
-#     - "boost-devel"    #not installed  in heat
-#     - "net-tools"
-#     - "strace"
-#     - "python-pip"
-#     - "munge"          #not installed in heat
-#     - "munge-devel"    #not installed in heat
-#     - "munge-libs"     # not installed  in heat
 
  - name: install pexpect from pip
    pip: name=pexpect version=3.3
