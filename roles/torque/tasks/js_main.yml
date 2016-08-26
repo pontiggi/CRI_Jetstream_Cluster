@@ -3,15 +3,11 @@
 # This version for Jetstream cluster!
 # Heat handles *most* of the Torque installation...
 
-   - name: run initial setup
-     expect:
-       command: /usr/share/doc/torque-4.2.10/torque.setup root
-       responses:
-         (?i)do you wish to continue: "y"
+   - name: enable and start trqauthd
+     service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
 
-# already done in heat...
-   - name: enable and start trqauthd
+   - name: enable and start trqauthd.service
      service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
 
@@ -38,7 +34,7 @@
      lineinfile: 
        dest: "/etc/torque/mom/config"
        regexp: '$pbsserver'
-       line: "$pbsserver {% for host in groups['submit_nodes'] %}{{hostvars['headnode']['ansible_host'] }}{% endfor %}"
+       line: "$pbsserver {% for host in groups['submit_nodes'] %}{{host    vars['headnode']['ansible_host'] }}{% endfor %}"
      when: submit_host == "no"
 
    - name: start pbs_mom on compute nodes

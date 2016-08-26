@@ -1,0 +1,35 @@
+---
+ 
+ - name: install libselinux-python packages
+   yum: name=libselinux-python state=present
+
+ - name: set up /etc/hosts
+   template: src=hosts.j2 dest=/etc/hosts
+
+ - name: set hostname
+   hostname: name={{ inventory_hostname }}
+ 
+ - name: install common packages
+   yum: name={{ item }} state=present
+   with_items:
+     - "vim" 
+     - "rsync"
+     - "epel-release"
+     - "openmpi"     
+     - "openmpi-devel"       
+     - "gcc"           
+     - "gcc-c++"       
+     - "gcc-gfortran"  
+     - "openssl-devel" 
+     - "libxml2-devel" 
+     - "boost-devel"   
+     - "net-tools"
+     - "strace"
+     - "python-pip"
+     - "munge"
+     - "munge-devel"
+     - "munge-libs"
+
+ - name: install pexpect from pip
+   pip: name=pexpect version=3.3
+   when: submit_host == "yes"

@@ -1,5 +1,5 @@
 ---
- - hosts: all
+ - hosts: submit_nodes compute_nodes
    roles:
    - {role: grid_user, cleanup: "yes"}
 
