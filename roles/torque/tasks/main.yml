@@ -3,28 +3,14 @@
 # This version for Jetstream cluster!
 # Heat handles *most* of the Torque installation...
 
-   - name: run initial setup
-     expect:
-       command: /usr/share/doc/torque-4.2.10/torque.setup root
-       responses:
-         (?i)do you wish to continue: "y"
-     when: submit_host == "yes"
-
 # already done in heat...
    - name: enable and start trqauthd
      service: name=trqauthd.service enabled=yes state=started
      when: submit_host == "yes"
 
-   - name: run qterm just in case
-     command: "qterm"
-     ignore_errors: yes
+   - name: restart trqauthd
+     service: name=trqauthd.service enabled=yes state=restarted
      when: submit_host == "yes"
-
-   - name: populate nodes file
-     template: src=js_pbs_queue.j2 dest=/var/lib/torque/server_priv/nodes
-     when: submit_host == "yes"
-
-#make sure servername is correct
 
    - name: start pbs_server and pbs_sched on submit nodes
      service: name=pbs_{{ item }} state=started enabled=yes
@@ -33,7 +19,22 @@
        - "sched"
      when: submit_host == "yes"
 
-#make sure servername is correct in two places?
+   - name: run qterm
+     command: "qterm"
+     ignore_errors: yes
+     when: submit_host == "yes"
+
+   - name: run initial setup
+     expect:
+       command: /usr/share/doc/torque-4.2.10/torque.setup root
+       responses:
+         (?i)do you wish to continue: "y"
+     when: submit_host == "yes"
+
+   - name: populate nodes file
+     template: src=js_pbs_queue.j2 dest=/var/lib/torque/server_priv/nodes
+     when: submit_host == "yes"
+
    - name: correct $pbsserver
      lineinfile: 
        dest: "/etc/torque/mom/config"
