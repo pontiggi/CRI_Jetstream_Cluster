@@ -1,9 +1,23 @@
 Use some Roles
  - Submit nodes, and compute nodes - allows for scaling if necessary
 
+Before running this playbook:
+ - make sure the VM's are configured via Heat
+ - make sure the network is set up to allow ssh to the control host
+ - edit ssh.cfg to point to the correct headnode ip!!!
+ -- something funny here... didn't work until I *tried* and failed 
+    to ssh into compute node from the head node...
+ - after running heat configs, the trqauthd and pbs_server services don't
+   work correctly with systemctl start - while already running, systemctl 
+  reports a failure...
+
 TODO:
- figure out why pbs_sched not scheduling jobs
- -- or switch to Maui..
+ - test on Jetstream!
+ -- fixed hostname issues w/ trqauthd (hopefully)
+ -- playbook *almost* runs, except for sudo can't access qterm
+ -- add /usr/local/sbin to sudo path!
+ -- then run playbook,  see if it works. If it does, either add keys, or try again from scratch.
+ -- add nfs mounts to compute nodes...
 
 Directory Layout:
 
