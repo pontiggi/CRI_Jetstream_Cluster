@@ -49,6 +49,9 @@
      when: submit_host == "yes"
 
 #verify that /var/spool/torque/server_name has the correct hostname? This works correctly in testing...
+   - name: set torque servername correctly
+     template: src=js_server_name.j2 dest=/var/spool/torque/server_name 
+     when: submit_host == "yes"
 
    - name: make compute node packages
      command: "make packages"
@@ -147,11 +150,11 @@
 #     when: submit_host == "no"
 
    - name: install mom package on compute nodes
-     command: "./torque-package-mom-linux-x86_64.sh --install"
+     command: "/root/torque-package-mom-linux-x86_64.sh --install"
      when: submit_host == "no"
 
    - name: install clients package on compute nodes
-     command: "./torque-package-clients-linux-x86_64.sh --install"
+     command: "/root/torque-package-clients-linux-x86_64.sh --install"
      when: submit_host == "no"
 
    - name: copy pbs_mom.service to usr/lib/systemd/system/
@@ -164,6 +167,10 @@
 
    - name: run ldconfig
      command: ldconfig
+     when: submit_host == "no"
+
+   - name: set torque servername correctly
+     template: src=js_server_name.j2 dest=/var/spool/torque/server_name 
      when: submit_host == "no"
 
    - name: start pbs_mom on compute nodes

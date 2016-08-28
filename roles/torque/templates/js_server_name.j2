@@ -1,0 +1,3 @@
+{% for host in groups['submit_nodes'] %}
+{{ inventory_hostname }}.jetstreamlocal
+{% endfor %}
