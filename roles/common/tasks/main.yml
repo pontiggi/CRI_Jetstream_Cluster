@@ -14,7 +14,7 @@
    template: src=hosts.j2 dest=/etc/hosts
 
  - name: set hostname
-   hostname: name={{ inventory_hostname }}.jetstreamlocal
+   hostname: name={{ inventory_hostname }}
  
 # - name: configure yum proxy on compute nodes
 #   lineinfile:
