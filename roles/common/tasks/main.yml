@@ -40,6 +40,7 @@
      - "boost-devel"   
      - "net-tools"
      - "strace"
+     - "fail2ban"
 #     - "exportfs" 
 #     - "firewalld"
 
