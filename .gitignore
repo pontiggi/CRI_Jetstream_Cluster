@@ -1,2 +1,5 @@
 *.pub
 *.retry
+*.key
+*.service
+files/
