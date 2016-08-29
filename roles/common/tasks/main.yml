@@ -14,7 +14,7 @@
    template: src=hosts.j2 dest=/etc/hosts
 
  - name: set hostname
-   hostname: name={{ inventory_hostname }}
+   hostname: name={{ inventory_hostname }}.jetstreamlocal
  
 # - name: configure yum proxy on compute nodes
 #   lineinfile:
@@ -67,7 +67,14 @@
      dest: /etc/sudoers
      regexp: "Defaults    requiretty"
      line:  "Defaults    !requiretty"
+     state: present
 
+ - name: turn off requiretty for sudo
+   lineinfile:
+     dest: /etc/sudoers
+     regexp: "Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin"
+     line: "Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin"
+     state: present
 # - name: install tinyproxy
 #   yum: name=tinyproxy state=present
 #   when: submit_host == "yes"
