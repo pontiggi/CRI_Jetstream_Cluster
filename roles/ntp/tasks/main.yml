@@ -6,8 +6,18 @@
  - name: ntp server template
    template: src={{ ntp_type }}_ntp.conf.j2 dest=/etc/ntp.conf
 
+ - name: set timezone (EDT)
+   timezone: name="America/Indiana/Indianapolis"
+   tags: 
+     - set_timezone
+
  - name: start and enable ntpd
    service: name=ntpd state=started enabled=yes
+
+ - name: start and enable ntpd
+   service: name=ntpd state=restarted enabled=yes
+   tags: 
+     - set_timezone
 
 # - name: set submit host as server
 

@@ -15,7 +15,7 @@
 
  - name: set hostname
    hostname: name={{ inventory_hostname }}
- 
+
 # - name: configure yum proxy on compute nodes
 #   lineinfile:
 #     dest: "/etc/yum.conf"
@@ -80,20 +80,32 @@
 #   yum: name=tinyproxy state=present
 #   when: submit_host == "yes"
 
- - name: export /home to compute nodes
+ - name: export /home/grid_user to compute nodes
    lineinfile:
      dest: /etc/exports
-     line:  "/home 10.0.0.0/24(rw)"
+     line:  "/home/grid_user 10.0.0.0/24(rw)"
      state: present
    tags:
      - export_home
    when: submit_host == "yes"
 
- - name: import /home on compute nodes
+ - name: allow use_nfs_home_dirs
+   seboolean: name=use_nfs_home_dirs state=yes persistent=yes
+   tags:
+     - export_home
+   when: submit_host == "no"
+
+ - name: import /home/grid_user on compute nodes
    lineinfile:
      dest: /etc/fstab
-     line:  "10.0.0.4:/home  /home  nfs  defaults 0 0"
+     line:  "10.0.0.4:/home/grid_user  /home/grid_user  nfs  defaults 0 0"
      state: present
+   tags:
+     - export_home
+   when: submit_host == "no"
+
+ - name: mount /home/grid_user
+   command: "mount -a"
    tags:
      - export_home
    when: submit_host == "no"
