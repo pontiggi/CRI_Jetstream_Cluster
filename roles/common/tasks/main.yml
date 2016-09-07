@@ -70,7 +70,7 @@
      line:  "Defaults    !requiretty"
      state: present
 
- - name: turn off requiretty for sudo
+ - name: fix sudo path (for qterm, etc)
    lineinfile:
      dest: /etc/sudoers
      regexp: "Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin"
@@ -79,6 +79,24 @@
 # - name: install tinyproxy
 #   yum: name=tinyproxy state=present
 #   when: submit_host == "yes"
+
+ - name: export /home to compute nodes
+   lineinfile:
+     dest: /etc/exports
+     line:  "/home 10.0.0.0/24(rw)"
+     state: present
+   tags:
+     - export_home
+   when: submit_host == "yes"
+
+ - name: import /home on compute nodes
+   lineinfile:
+     dest: /etc/fstab
+     line:  "10.0.0.4:/home  /home  nfs  defaults 0 0"
+     state: present
+   tags:
+     - export_home
+   when: submit_host == "no"
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
