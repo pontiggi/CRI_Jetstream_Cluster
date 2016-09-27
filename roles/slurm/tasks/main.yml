@@ -1,0 +1,127 @@
+---
+
+#thought about splitting this into two yml files... but requires a restart of pbs_server
+# on the headnode *after* pbs_mom is running on computes... so no.
+
+   - name: create munge key # MUNGE DOESN'T WORK AS INSTALLED FROM THE REPO... 
+     command: create-munge-key
+     when: submit_host == "yes"
+
+   - name: copy munge key back to management machine
+     synchronize:
+      mode: pull
+       use_ssh_args: yes
+       src: /etc/munge/munge.key
+       dest: roles/slurm/files/munge.key
+     when: submit_host == "yes"
+
+   - name: enable and start munge
+     service: name=munge.service enabled=yes state=started
+     when: submit_host == "yes"
+
+   - name: ensure build dir exists
+     file: path=/root/build/slurm state=directory recurse=yes
+     when: submit_host == "yes"
+
+   - name: unpack source
+     unarchive: src=files/slurm_src.tar.gz dest=/root/build
+     when: submit_host == "yes"
+
+   - name: run configure before make
+     command: "./configure"  # -- configure-munge-auth
+     args:
+       chdir: "/root/build/slurm-{{ slurm_version }}"
+       creates: "/root/build/slurm-{{ slurm_version }}/Makefile"
+     when: submit_host == "yes"
+
+   - name: make slurm
+     command: "make all"
+     args:
+       chdir: "/root/build/slurm-{{ slurm_version }}"
+       creates: "/root/build/slurm-{{ slurm_version }}/src/cmds/pbsnodes"
+     when: submit_host == "yes"
+
+   - name: make install slurm
+     command: "make install"
+     args:
+       chdir: "/root/build/slurm-{{ slurm_version }}"
+       creates: "/var/spool/slurm/server_name"
+     when: submit_host == "yes"
+
+#may replace this by slurm rpmbuild?
+   - name: make compute node packages
+     command: "make packages"
+     args:
+       chdir: "/root/build/slurm-{{ slurm_version }}"
+       creates: "/root/build/slurm-{{ slurm_version }}/slurm-package-mom-linux-x86_64.sh"
+     when: submit_host == "yes"
+
+   - name: copy compute packages back to management machine
+     synchronize:
+       mode: pull
+       use_ssh_args: yes
+       src: "/root/build/slurm-{{ slurm_version }}/{{ item }}"
+       dest: roles/slurm/files/
+     with_items:
+       - "slurm-package-mom-linux-x86_64.sh"
+       - "slurm-package-clients-linux-x86_64.sh"
+       - "contrib/systemd/pbs_mom.service"
+     when: submit_host == "yes"
+
+   - name: copy trqauthd.service to usr/lib/systemd/system/
+     copy: src="/root/build/slurm-{{ slurm_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
+     when: submit_host == "yes"
+
+   - name: create slurm.conf in /etc/ld.so.conf.d/
+     lineinfile: dest=/etc/ld.so.conf.d/slurm.conf state=present line='/usr/local/lib' create=yes
+     when: submit_host == "yes"
+
+   - name: run ldconfig
+     command: ldconfig
+     when: submit_host == "yes"
+
+   - name: enable and start trqauthd
+     service: name=trqauthd.service enabled=yes state=started
+     when: submit_host == "yes"
+
+     when: submit_host == "yes"
+
+   - name: populate nodes file
+     template: src=pbs_queue.j2 dest=/var/spool/slurm/server_priv/nodes
+     when: submit_host == "yes"
+
+   - name: start pbs_server and pbs_sched on submit nodes
+     service: name=pbs_{{ item }} state=started enabled=yes
+     with_items:
+       - "server"
+       - "sched"
+     when: submit_host == "yes"
+
+   - name: copy mom and client packages to compute nodes
+     synchronize:
+       mode: push
+       use_ssh_args: yes
+       src: files/{{ item }}
+       dest: "/root/{{ item }}"
+     when: submit_host == "no"
+     with_items:
+       - "slurm-package-mom-linux-x86_64.sh"
+       - "slurm-package-clients-linux-x86_64.sh"
+       - "pbs_mom.service"
+
+   - name: copy munge key from submit node
+     synchronize:
+       mode: push
+       src: files/munge.key
+       dest: /etc/munge/munge.key
+     when: submit_host == "no"
+     with_fileglob:
+       - files/*munge.key
+
+   - name: enable and start munge
+     service: name=munge.service enabled=yes state=started
+     when: submit_host == "no"
+
+   - name: install mom package on compute nodes
+     command: "/root/slurm-package-mom-linux-x86_64.sh --install"
+     when: submit_host == "no"
