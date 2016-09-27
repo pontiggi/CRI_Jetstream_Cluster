@@ -1,0 +1,19 @@
+---
+ 
+ - name: set up postfix correctly for jetstream-cloud
+   lineinfile: 
+     dest: /etc/postfix/main.cf
+     line: "{{ item.line }}"
+     state: present
+     regexp: "{{ item.regexp }}"
+   with_items:
+     - { line: 'mydomain = jetstream-cloud.org', regexp: '^#mydomain|^mydomain' }
+     - { line: 'myorigin = $mydomain', regexp: '^#myorigin|myorigin' }
+   tags:
+     - postfix_setup
+   when: submit_host == "yes"
+
+ - name: restart postfix daemon
+   service: name=postfix state=restarted enabled=yes
+   tags:
+    - postfix_setup
