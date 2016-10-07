@@ -43,6 +43,8 @@
      - "fail2ban"
 #     - "exportfs" 
 #     - "firewalld"
+# if you add a firewall, need:
+# sudo firewall-cmd --permanent --zone=public --add-rich-rule "rule source address='10.0.0.0/24' family='ipv4' accept"
 
 # - name: fix broken http for epel on compute nodes
 #   lineinfile: 
