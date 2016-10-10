@@ -25,6 +25,12 @@
      dest: roles/grid_user/files/{{ inventory_hostname }}_host_key.pub
    when: cleanup == "no"
  
+ - name: add mpi module to bashrc
+   lineinfile: 
+     dest: /home/grid_user/.bashrc 
+     state: present
+     line: "module load mpi"
+ 
  - name: edit host key file to contain hostname
    local_action: lineinfile 
                  dest=roles/grid_user/files/{{ inventory_hostname }}_host_key.pub

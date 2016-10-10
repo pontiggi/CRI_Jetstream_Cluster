@@ -41,6 +41,7 @@
      - "net-tools"
      - "strace"
      - "fail2ban"
+     - "wget"  # needed for building QE
 #     - "exportfs" 
 #     - "firewalld"
 

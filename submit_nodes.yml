@@ -2,11 +2,14 @@
  - hosts: submit_nodes
    roles:
      - common
-     - xnit
      - {role: grid_user, cleanup: "no"}
+     - applications
+     - xnit
      - ntp
      - torque
-#     - grid_user
+     - postfix
+
+#THE ROLES BELOW DO NOT EXIST
 #     - Maui_master
 #     - nfs_server
 #      - ssh_gen_grid_user 
