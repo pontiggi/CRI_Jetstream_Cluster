@@ -1,0 +1,189 @@
+heat_template_version: 2013-05-23
+
+description:
+
+parameters:
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: "CentOS-7-x86_64-GenericCloud-1607"
+  flavor: # this is just for the head node
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: m1.small
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be used for compute instance
+    default: my_key
+  cluster_size:
+    type: number
+    label: Cluster size
+    description: Number of instances in cluster.
+    default: 4 # this is total size, includes head node and computes
+
+resources:
+
+  torque_server_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #!/bin/bash
+        sleep 1
+         
+
+  sysctl_10gige_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #! /bin/bash
+        sysctl -w net.core.netdev_max_backlog=300000
+        sysctl -w 'net.ipv4.tcp_wmem=4096 87380 16777216'
+        sysctl -w 'net.ipv4.tcp_rmem=4096 87380 16777216'
+        sysctl -w net.core.wmem_max=16777216
+        sysctl -w net.core.rmem_max=16777216
+
+  fix_epel_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #! /bin/bash
+        mv /etc/yum.repos.d/epel.repo.rpmnew /etc/yum.repos.d/epel.repo
+        
+  shared_volume_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config: |
+        #! /bin/bash
+        parted /dev/sdb mklabel gpt
+        parted --align optimal -- /dev/sdb mkpart primary xfs 2 -1
+        partprobe /dev/sdb
+        mkfs.xfs -K /dev/sdb1
+        mkdir /N
+        mount /dev/sdb1 /N -o noatime,discard
+        echo '/N 10.0.0.0/24(rw)' >> /etc/exports
+        systemctl enable rpcbind
+        systemctl enable nfs-server
+        systemctl enable nfs-lock
+        systemctl enable nfs-idmap
+        systemctl start rpcbind
+        systemctl start nfs-server
+        systemctl start nfs-lock
+        systemctl start nfs-idmap
+        exportfs -va
+        echo '/dev/sdb1       /N      xfs     noatime,discard,rw      0 0' >> /etc/fstab
+
+  torque_server_signal_script:
+    type: OS::Heat::SoftwareConfig
+    properties:
+      group: ungrouped
+      config:
+        str_replace:
+          params:
+            $WC_NOTIFY: { get_attr: ['wait_handle', 'curl_cli'] }
+          template: { get_file: notify.sh }
+
+  torque_server_packages:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        yum_repos:
+          epel:
+            baseurl: "http://ftp.ussg.iu.edu/linux/epel/7/x86_64/"
+            enabled: true
+            gpgcheck: true
+            gpgkey: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7"
+            name: "Extra Packages for Enterprise Linux 7 - $basearch"
+        package_upgrade: true
+        packages:
+          - "@Development Tools"
+          - qemu-guest-agent
+          - python-virtualenv
+          - python-pip
+          - cmake
+          - wget
+          - emacs-nox
+          - parted
+          - cloud-utils
+          - epel-release
+
+  server_init:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+      - config: {get_resource: torque_server_packages}
+      - config: {get_resource: torque_server_script}
+      - config: {get_resource: fix_epel_script}
+      - config: {get_resource: sysctl_10gige_script}
+      - config: {get_resource: shared_volume_script}
+      - config: {get_resource: torque_server_signal_script}
+      
+  wait_condition:
+    type: OS::Heat::WaitCondition
+    properties:
+      handle: { get_resource: wait_handle }
+      count: 1
+      timeout: 600
+
+  wait_handle:
+    type: OS::Heat::WaitConditionHandle
+ 
+  torque_server:
+    type: OS::Nova::Server
+    properties:
+      name: torque_server
+      security_groups: [ default ]
+      flavor: { get_param: flavor }
+      image: { get_param: image }
+      key_name: { get_param: key }
+      user_data_format: SOFTWARE_CONFIG
+      user_data: {get_resource: server_init}
+      networks:
+        - network: { get_attr: [private_network, name] } 
+  torque_server_public_ip:
+    type: OS::Neutron::FloatingIP
+    properties:
+      floating_network: public
+  torque_server_floating_ip_association:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_resource: torque_server_public_ip }
+      server_id: { get_resource: torque_server }
+
+  compute_cluster:
+    type: OS::Heat::ResourceGroup
+    depends_on: wait_condition
+    properties:
+      count: { get_param: cluster_size }
+      resource_def:
+        type: compute.yaml
+        properties:
+          name: compute-%index%
+          image: { get_param: image }
+          flavor: m1.large
+          key: { get_param: key }
+          private_network: { get_attr: [private_network, name] }
+          server_ip: 10.0.0.4
+
+  private_network:
+    type: network.yaml
+
+  shared_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: 1024
+  shared_volume_attachment:
+    type: OS::Cinder::VolumeAttachment
+    properties:
+      instance_uuid: { get_resource: torque_server }
+      volume_id: { get_resource: shared_volume }
+
+outputs:
+  server_ip:
+    value: { get_attr: [torque_server, first_address] }
