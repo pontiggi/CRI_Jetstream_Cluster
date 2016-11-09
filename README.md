@@ -6,6 +6,10 @@ via Heat scripts, available here [link].
 In theory, this would work on bare metal as well, although it will not ease the pain of deploying CentOS 7 on many nodes, and you would need
 to hand-generate a list of IP addresses (or modify this to run a dhcp server on the head node...).
 
+#How To
+1. Run the no\_torque.yml 
+2. Run the ansible playbook. 
+
 #Roles
 
 There are several roles here, which may be generally useful for some other things.
