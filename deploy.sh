@@ -34,7 +34,7 @@ fi
 
 # current heat config has no shared volume due to acccount restricitons...
 #COMMENT OUT FOR TESTING BEHAVIOUR WITHOUT REBUILDING
-#openstack stack create --parameter key=jetstream_key -t ./heat-config/no_torque.yml $stack_name | tee -a $deploy_log
+openstack stack create --parameter key=jetstream_key -t ./heat-config/no_torque.yml $stack_name | tee -a $deploy_log
 
 #need until loop - check every minute that the stack built or not:
 stack_build_status=$(openstack stack show -c stack_status $stack_name | awk '/stack_status/ {print $4}')
