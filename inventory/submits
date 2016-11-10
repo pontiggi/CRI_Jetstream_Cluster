@@ -1,2 +1,2 @@
 [submit_nodes]
-torque_server ansible_host=149.165.170.153 ansible_connection=ssh ansible_user=centos ansible_become=true become_method=sudo 
+torque_server ansible_host=149.165.156.83 ansible_connection=ssh ansible_user=centos ansible_become=true become_method=sudo 
