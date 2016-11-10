@@ -49,11 +49,11 @@
 
 # will this work?!
  - name: copy host keys to all nodes
-   assemble: src=files regexp=_host_key.pub dest=/etc/ssh/ssh_known_hosts remote_src=no
+   assemble: src=roles/grid_user/files regexp=_host_key.pub dest=/etc/ssh/ssh_known_hosts remote_src=no
    when: cleanup == "yes"
 
  - name: provide sample pbs job script
-   copy: src=files/node_query.job dest=/home/grid_user/node_query.job owner=grid_user mode=644
+   copy: src=roles/grid_user/files/node_query.job dest=/home/grid_user/node_query.job owner=grid_user mode=644
    when: (submit_host == "yes" and cleanup == "yes")
 
  - name: add module load to .bashrc...
