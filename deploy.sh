@@ -88,4 +88,5 @@ fi
 #Then, ansible-playbook (finally!)
 source $ansible_loc
 # I bet tee breaks ansible again...
-ansible-playbook cluster.yml | tee -a $deploy_log
+ansible-playbook -i inventory cluster.yml | tee -a $deploy_log
+#ansible submit_nodes -i inventory -a "hostname"
