@@ -111,7 +111,7 @@ resources:
       - config: {get_resource: torque_server_packages}
       - config: {get_resource: fix_epel_script}
       - config: {get_resource: sysctl_10gige_script}
-      - config: {get_resource: shared_volume_script}
+#      - config: {get_resource: shared_volume_script}
       - config: {get_resource: torque_server_signal_script}
       
   wait_condition:
@@ -164,15 +164,15 @@ resources:
   private_network:
     type: network.yaml
 
-  shared_volume:
-    type: OS::Cinder::Volume
-    properties:
-      size: 1024
-  shared_volume_attachment:
-    type: OS::Cinder::VolumeAttachment
-    properties:
-      instance_uuid: { get_resource: torque_server }
-      volume_id: { get_resource: shared_volume }
+#  shared_volume:
+#    type: OS::Cinder::Volume
+#    properties:
+#      size: 1024
+#  shared_volume_attachment:
+#    type: OS::Cinder::VolumeAttachment
+#    properties:
+#      instance_uuid: { get_resource: torque_server }
+#      volume_id: { get_resource: shared_volume }
 
 outputs:
   server_ip:
