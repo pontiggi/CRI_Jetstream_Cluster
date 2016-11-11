@@ -40,10 +40,11 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 
 3. Edit the first few lines of deploy.sh to point to your ssh key
    of choice, your ansible installation, your openrc.sh, and choose
-   a name for your stack.
+   a name for your stack. You may also edit this to reflect the number
+   of nodes!
 
-4. Run deploy.sh - ssh into your new cluster and enjoy!
-   See the file Cluster\_deploy.log for ip information.
+4. Run deploy.sh, wait, ssh into your new cluster, and enjoy!
+   See the file Cluster\_deploy.log or ssh.cfg for ip information.
 
 #Roles
 

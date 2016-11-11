@@ -1,14 +1,17 @@
 #!/bin/bash
 
-#these should come in as mandatory args with 'sensible' defaults
 openrc_loc=./openrc.sh #openrc.sh file - see Jetstream docs!
 ssh_key=/home/jecoulte/.ssh/testkey.pub #ssh key for your nodes
 ansible_loc=/home/jecoulte/Work/Tools/ansible/hacking/env-setup #ansible environment variables
-deploy_log=./Cluster_deploy.log #log file - hopefully I've redirected everything to here.
-#:%s/echo \(.*\)/echo \1 | tee -a $deploy_log/gc should allow you to fix that (in vim)
+deploy_log=./Cluster_deploy.log #log file
 stack_name="test_stack" #name of the stack
 declare -i number_of_nodes
 number_of_nodes=4 #please don't make this anything other than an integer! It gets used in a regex below.
+
+#--------------------------------------------------------
+# NOTHING BELOW THIS SHOULD BE EDITED BY HAND 
+#(unless errors are encountered)
+#--------------------------------------------------------
 compute_inventory=inventory/computes
 submit_inventory=inventory/submits
 
