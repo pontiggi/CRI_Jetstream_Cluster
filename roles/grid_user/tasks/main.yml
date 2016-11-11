@@ -39,13 +39,13 @@
                  line='{{ inventory_hostname }} \1'
    when: cleanup == "yes"
 
- - name: copy ssh keys to all nodes
+ - name: authorize ssh for grid_user
    authorized_key:
      user: grid_user
      key: "{{ lookup('file','{{ item }}') }} "
    with_fileglob:
-     - files/*_id_rsa.pub 
-   when: cleanup == "yes"
+     - roles/grid_user/files/{{ inventory_hostname }}_id_rsa.pub 
+   when: (submit_host == "yes" and cleanup == "yes")
 
 # will this work?!
  - name: copy host keys to all nodes

@@ -86,11 +86,15 @@
  - name: export /home/grid_user to compute nodes
    lineinfile:
      dest: /etc/exports
-     line:  "/home/grid_user 10.0.0.0/24(rw)"
+     line:  "/home/grid_user 10.0.0.0/24(rw,no_root_squash)"
      state: present
    tags:
      - export_home
    when: submit_host == "yes"
+
+ - name: restart nfs
+   service: name=nfs state=restarted
+   when: (submit_host == "yes" and cleanup == "yes")
 
  - name: allow use_nfs_home_dirs
    seboolean: name=use_nfs_home_dirs state=yes persistent=yes
@@ -111,7 +115,7 @@
    command: "mount -a"
    tags:
      - export_home
-   when: submit_host == "no"
+   when: (submit_host == "no" and cleanup == "yes")
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf

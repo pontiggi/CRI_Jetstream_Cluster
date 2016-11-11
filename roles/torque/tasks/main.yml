@@ -24,7 +24,7 @@
      when: submit_host == "yes"
 
    - name: unpack source
-     unarchive: src=files/torque_src.tar.gz dest=/root/build
+     unarchive: src=roles/torque/files/torque_src.tar.gz dest=/root/build
      when: submit_host == "yes"
 
    - name: run configure before make

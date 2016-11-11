@@ -1,7 +1,7 @@
 ---
  - hosts: compute_nodes
    roles:
-     - common
+     - {role: common, cleanup: "no"}
      - xnit
      - {role: grid_user, cleanup: "no"}
      - ntp
