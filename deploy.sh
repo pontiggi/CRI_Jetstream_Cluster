@@ -104,7 +104,7 @@ if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
         exit #fail hard if a node is broken
       fi
 # add or correct entry in inventory file if needed
-      if [[ $(grep $ssh_compute $compute_inventory) == "" ]] then
+      if [[ $(grep $ssh_compute $compute_inventory) == "" ]]; then
         echo "$ssh_compute ansible_connection=ssh ansible_host=10.0.0.$i ansible_user=centos ansible_become=true become_method=sudo" >> $compute_inventory
       else
         sed -i "s/$ssh_compute\(.*\)=10.0.0.[0-9]\+\(.*\)/$ssh_compute\1=10.0.0.$i\2/" $compute_inventory
