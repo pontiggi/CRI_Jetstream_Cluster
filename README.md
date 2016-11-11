@@ -46,9 +46,14 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 4. Run deploy.sh, wait, ssh into your new cluster, and enjoy!
    See the file Cluster\_deploy.log or ssh.cfg for ip information.
 
+#IN CASE OF FAILURE (Or you want to build anew)
+
+1. Run destroy.sh and try again! 
+
 #Roles
 
 There are several roles here, which may be generally useful for some other things.
+Documentation on these will be forthcoming. A Slurm role is also in progress.
 
 ## Common
 
