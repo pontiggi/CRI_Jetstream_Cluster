@@ -3,8 +3,8 @@
    roles:
      - {role: common, cleanup: "no"}
      - {role: grid_user, cleanup: "no"}
-     - applications
      - xnit
+     - applications
      - ntp
      - torque
      - postfix
