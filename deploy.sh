@@ -9,7 +9,8 @@ deploy_log=./Cluster_deploy.log #log file - hopefully I've redirected everything
 stack_name="test_stack" #name of the stack
 declare -i number_of_nodes
 number_of_nodes=4 #please don't make this anything other than an integer! It gets used in a regex below.
-compute_inventory=./inventory/computes
+compute_inventory=inventory/computes
+submit_inventory=inventory/submits
 
 echo "Using openrc from: $openrc_loc" | tee $deploy_log
 echo "Using ssh_key: $ssh_key" | tee -a $deploy_log
@@ -76,29 +77,33 @@ if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   echo "Stack build Complete!" | tee -a $deploy_log
   headnode_id_hash=$(openstack stack resource list $stack_name | awk '/torque_server / {print $4}')
   headnode_ip=$(nova floating-ip-list | awk "/$headnode_id_hash/"'{print $4}')
+
   echo "Setting ip in ansible config files..." | tee -a $deploy_log
-# using a regex to replace ip address - now we have 10 problems!!! (possibly 11)
+# replace ip address in ssh.cfg and inventory- now we have 10 problems!!! (possibly 11)
   sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" ssh.cfg
-  sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" inventory/submits
+  sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" $submit_inventory
   echo "Headnode ip: $headnode_ip - testing ssh..." | tee -a $deploy_log
+
   ssh_hostname=$(ssh -F ssh.cfg $headnode_ip 'hostname' 2>&1 | tee -a $deploy_log) 
   if [[ ! $ssh_hostname =~ "torque-server" ]]; then
     echo "ssh connection to headnode Failed! Please try again." | tee -a $deploy_log
     echo "SSH ERROR: $ssh_hostname" | tee -a $deploy_log
     exit
   else
-    echo "Connection made to head node - testing computes now." | tee -a $deploy_log
+# test compute nodes and generate inventory file
     declare -i last_node=$number_of_nodes+4
-# generate inventory file
+    echo "Connection made to head node - testing computes now." | tee -a $deploy_log
     echo "[compute_nodes]" > $compute_inventory
+
     for i in $(seq 5 $last_node) 
     do
       ssh_compute=$(ssh -q -F ssh.cfg 10.0.0.$i 'hostname' 2>&1) 
       echo "Result of connecting to 10.0.0.$i : $ssh_compute" | tee -a $deploy_log
       if [[ ! $ssh_compute =~ 'compute-' ]]; then
-        echo "Failed to connect! Check compute node build and try again." | tee -a $deploy_log
+        echo "Failed to connect! Check compute node build and try again." | tee -a $deploy_log 
+        exit #fail hard if a node is broken
       fi
-# correct or add entry in inventory file if needed
+# add or correct entry in inventory file if needed
       if [[ $(grep $ssh_compute $compute_inventory) == "" ]] then
         echo "$ssh_compute ansible_connection=ssh ansible_host=10.0.0.$i ansible_user=centos ansible_become=true become_method=sudo" >> $compute_inventory
       else
