@@ -1,6 +1,12 @@
 ---
-#install/build QE
 
+# - name: install scientific apps from XNIT
+#   yum: name={{ item }} state=present
+#   with_items:
+#    - "gromacs" #these need testing for the right package names!
+#    - "lammps"
+
+#install/build QE
 #wget http://www.qe-forge.org/gf/download/frsrelease/211/968/espresso-5.4.0.tar.gz 
  - name: get Quantum Espresso source
    unarchive: src=http://www.qe-forge.org/gf/download/frsrelease/211/968/espresso-5.4.0.tar.gz dest=/home/grid_user remote_src=yes owner=grid_user group=users
