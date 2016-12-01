@@ -30,7 +30,7 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 7. Edit the following files to contain the correct ssh key and headnode
    ip: ssh.cfg and inventory/submits
 
-7. Run the ansible playbook. 
+8. Run the ansible playbook. 
    `ansible-playbook cluster.yml`
 
 #How To - the Easy Way
@@ -49,6 +49,14 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 #IN CASE OF FAILURE (Or you want to build anew)
 
 1. Run destroy.sh and try again! 
+
+#Upcoming Features
+
+1. Scripts for adding/removing compute nodes
+
+2. Fully elastic compute (dependent on 1.)
+
+3. Slurm option
 
 #Roles
 
