@@ -38,7 +38,7 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 
 2. Install ansible somehow.
 
-3. Edit the first few lines of deploy.sh to point to your ssh key
+3. Edit the lines in stack\_settings to point to your ssh key
    of choice, your ansible installation, your openrc.sh, and choose
    a name for your stack. You may also edit this to reflect the number
    of nodes!

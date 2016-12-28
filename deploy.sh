@@ -1,12 +1,14 @@
 #!/bin/bash
 
-openrc_loc=./openrc_slurm.sh #openrc.sh file - see Jetstream docs!
-ssh_key=/home/jecoulte/.ssh/testkey.pub #ssh key for your nodes
-ansible_loc=/home/jecoulte/Work/Tools/ansible/hacking/env-setup #ansible environment variables
-deploy_log=./Cluster_deploy.log #log file
-stack_name="test_stack" #name of the stack
-declare -i number_of_nodes
-number_of_nodes=4 #please don't make this anything other than an integer! It gets used in a regex below.
+source ./stack_settings
+
+#openrc_loc=./openrc_slurm.sh #openrc.sh file - see Jetstream docs!
+#ssh_key=/home/jecoulte/.ssh/testkey.pub #ssh key for your nodes
+#ansible_loc=/home/jecoulte/Work/Tools/ansible/hacking/env-setup #ansible environment variables
+#deploy_log=./Cluster_deploy.log #log file
+#stack_name="test_stack" #name of the stack
+#declare -i number_of_nodes
+#number_of_nodes=4 #please don't make this anything other than an integer! It gets used in a regex below.
 
 #--------------------------------------------------------
 # NOTHING BELOW THIS SHOULD BE EDITED BY HAND 

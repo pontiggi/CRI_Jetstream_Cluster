@@ -1,7 +1,9 @@
 #!/bin/bash
 
-openrc_loc=./openrc.sh #openrc.sh file - see Jetstream docs!
-stack_name=$(grep 'stack_name=' deploy.sh | sed -e 's/.*"\(.*\)".*/\1/')
+#openrc_loc=./openrc.sh #openrc.sh file - see Jetstream docs!
+#stack_name=$(grep 'stack_name=' deploy.sh | sed -e 's/.*"\(.*\)".*/\1/')
+
+source ./stack_settings
 
 source $openrc_loc
 
