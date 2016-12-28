@@ -3,4 +3,4 @@
 *.key
 *.service
 files/
-openrc.sh
+openrc*.sh
