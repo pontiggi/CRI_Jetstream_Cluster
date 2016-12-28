@@ -25,12 +25,6 @@
      dest: roles/grid_user/files/{{ inventory_hostname }}_host_key.pub
    when: cleanup == "no"
  
- - name: add mpi module to bashrc
-   lineinfile: 
-     dest: /home/grid_user/.bashrc 
-     state: present
-     line: "module load mpi"
- 
  - name: edit host key file to contain hostname
    local_action: lineinfile 
                  dest=roles/grid_user/files/{{ inventory_hostname }}_host_key.pub
@@ -39,21 +33,21 @@
                  line='{{ inventory_hostname }} \1'
    when: cleanup == "yes"
 
- - name: authorize ssh for grid_user
+ - name: copy ssh keys to all nodes
    authorized_key:
      user: grid_user
      key: "{{ lookup('file','{{ item }}') }} "
    with_fileglob:
-     - roles/grid_user/files/{{ inventory_hostname }}_id_rsa.pub 
-   when: (submit_host == "yes" and cleanup == "yes")
+     - files/*_id_rsa.pub 
+   when: cleanup == "yes"
 
 # will this work?!
  - name: copy host keys to all nodes
-   assemble: src=roles/grid_user/files regexp=_host_key.pub dest=/etc/ssh/ssh_known_hosts remote_src=no
+   assemble: src=files regexp=_host_key.pub dest=/etc/ssh/ssh_known_hosts remote_src=no
    when: cleanup == "yes"
 
  - name: provide sample pbs job script
-   copy: src=roles/grid_user/files/node_query.job dest=/home/grid_user/node_query.job owner=grid_user mode=644
+   copy: src=files/node_query.job dest=/home/grid_user/node_query.job owner=grid_user mode=644
    when: (submit_host == "yes" and cleanup == "yes")
 
  - name: add module load to .bashrc...
