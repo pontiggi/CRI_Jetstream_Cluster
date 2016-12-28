@@ -13,6 +13,12 @@
  - name: set up /etc/hosts
    template: src=hosts.j2 dest=/etc/hosts
 
+ - name: set up /etc/ssh/sshd_config
+   template: src=sshd_config.j2 dest=/etc/ssh/sshd_config
+
+ - name: reload sshd
+   service: name=sshd state=reloaded
+
  - name: set hostname
    hostname: name={{ inventory_hostname }}
 
@@ -42,10 +48,11 @@
      - "strace"
      - "fail2ban"
      - "wget"  # needed for building QE
+     - "readline-devel"  #req for slurm
+     - "pam-devel"       # req for slurm
+     - "perl-ExtUtils-MakeMaker" # req for slurm
 #     - "exportfs" 
 #     - "firewalld"
-# if you add a firewall, need:
-# sudo firewall-cmd --permanent --zone=public --add-rich-rule "rule source address='10.0.0.0/24' family='ipv4' accept"
 
 # - name: fix broken http for epel on compute nodes
 #   lineinfile: 
@@ -83,18 +90,14 @@
 #   yum: name=tinyproxy state=present
 #   when: submit_host == "yes"
 
- - name: export /home/grid_user to compute nodes
+ - name: export /home to compute nodes
    lineinfile:
      dest: /etc/exports
-     line:  "/home/grid_user 10.0.0.0/24(rw,no_root_squash)"
+     line:  "/home 10.0.0.0/24(rw,no_root_squash)"
      state: present
    tags:
      - export_home
    when: submit_host == "yes"
-
- - name: restart nfs
-   service: name=nfs state=restarted
-   when: (submit_host == "yes" and cleanup == "yes")
 
  - name: allow use_nfs_home_dirs
    seboolean: name=use_nfs_home_dirs state=yes persistent=yes
@@ -102,20 +105,24 @@
      - export_home
    when: submit_host == "no"
 
- - name: import /home/grid_user on compute nodes
+ - name: restart nfs
+   service: name=nfs state=restarted
+   when: (submit_host == "yes" and cleanup == "yes")
+
+ - name: import /home on compute nodes
    lineinfile:
      dest: /etc/fstab
-     line:  "10.0.0.4:/home/grid_user  /home/grid_user  nfs  defaults 0 0"
+     line:  "10.0.0.4:/home  /home  nfs  defaults 0 0"
      state: present
    tags:
      - export_home
    when: submit_host == "no"
 
- - name: mount /home/grid_user
+ - name: mount /home
    command: "mount -a"
    tags:
      - export_home
-   when: (submit_host == "no" and cleanup == "yes")
+   when: submit_host == "no"
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
