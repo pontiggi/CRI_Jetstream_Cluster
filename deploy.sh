@@ -1,6 +1,6 @@
 #!/bin/bash
 
-openrc_loc=./openrc.sh #openrc.sh file - see Jetstream docs!
+openrc_loc=./openrc_slurm.sh #openrc.sh file - see Jetstream docs!
 ssh_key=/home/jecoulte/.ssh/testkey.pub #ssh key for your nodes
 ansible_loc=/home/jecoulte/Work/Tools/ansible/hacking/env-setup #ansible environment variables
 deploy_log=./Cluster_deploy.log #log file

@@ -5,7 +5,8 @@
      - xnit
      - {role: grid_user, cleanup: "no"}
      - ntp
-     - torque
+#     - torque
+     - slurm
 #    - nfs_client
 #    - ganglia_client
 #    - common

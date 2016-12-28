@@ -6,7 +6,8 @@
      - xnit
      - applications
      - ntp
-     - torque
+#     - torque
+     - slurm
      - postfix
 
 #THE ROLES BELOW DO NOT EXIST
