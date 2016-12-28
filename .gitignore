@@ -4,3 +4,5 @@
 *.service
 files/
 openrc*.sh
+*.log
+notes/
