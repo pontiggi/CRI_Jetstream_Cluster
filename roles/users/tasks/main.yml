@@ -1,0 +1,49 @@
+---
+
+ - name: user-specific tasks
+   include: user_tasks.yml
+   with_items: "{{ users + admins }}" 
+   when: cleanup == "no"
+
+ - name: make sure the 'wheel' group exists
+   group:
+     name: wheel
+     state: present
+
+ - name: allow nopasswd sudo for wheel
+   lineinfile:
+     dest: /etc/sudoers
+     state: present
+     regexp: '^%wheel'
+     line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+ - name: give admins power
+   include: admin_tasks.yml
+   with_items: "{{ admins }}"
+   when: cleanup == "no"
+
+ - name: copy host key back to management machine
+   synchronize:
+     mode: pull
+     use_ssh_args: yes
+     src: /etc/ssh/ssh_host_ecdsa_key.pub
+     dest: roles/users/files/keys/{{ inventory_hostname }}_host_key.pub
+   when: cleanup == "no"
+ 
+ - name: edit host key file to contain hostname
+   local_action: lineinfile 
+                 dest=roles/users/files/keys/{{ inventory_hostname }}_host_key.pub
+                 regexp='^(.*)$' 
+                 backrefs=yes
+                 line='{{ inventory_hostname }} \1'
+   when: cleanup == "yes"
+
+ - name: user-specific cleanup
+   include: user_cleanup_tasks.yml
+   with_items: "{{ users + admins }}" 
+   when: cleanup == "yes"
+
+# will this work?!
+ - name: copy host keys to all nodes
+   assemble: src=keys regexp=_host_key.pub dest=/etc/ssh/ssh_known_hosts remote_src=no
+   when: cleanup == "yes"

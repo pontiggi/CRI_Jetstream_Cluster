@@ -1,0 +1,24 @@
+---
+
+ - set_fact:
+     user_name: "{{ item }}"
+
+ - name: create {{ user_name }} with a key
+   user:
+     name: "{{ user_name }}"
+     shell: /bin/bash
+     generate_ssh_key: yes
+     state: present
+     createhome: yes
+   when: submit_host == "yes"
+ 
+ - name: get uid from submit_node
+   getent: database=passwd key={{ user_name }} split=':'
+
+ - name: copy key back to management machine
+   synchronize:
+     mode: pull
+     use_ssh_args: yes
+     src: /home/{{ item }}/.ssh/id_rsa.pub
+     dest: roles/grid_user/files/{{ inventory_hostname }}_{{ user_name }}_id_rsa.pub
+
