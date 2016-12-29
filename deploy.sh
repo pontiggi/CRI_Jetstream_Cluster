@@ -23,6 +23,7 @@ echo "Sourcing ansible variables from: $ansible_loc" | tee -a $deploy_log
 
 #set the number of compute (non-head) nodes
 sed -i "s/^    default: [0-9]\+/    default: $number_of_nodes/" heat-config/no_torque.yml
+sed -i "s/\(\s\+number_of_nodes:\)\s\+[0-9]\+/\1 $number_of_nodes/" group_vars/all
 
 # use all nodes in test script
 sed -i "s/nodes=[0-9]\+/nodes=$number_of_nodes/" roles/grid_user/files/node_query.job

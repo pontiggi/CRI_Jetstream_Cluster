@@ -1,3 +1,10 @@
 ---
+  cluster_name: jetstream-cluster
   torque_version: 6.0.2-1469811694_d9a3483
   slurm_version: 16.05.4
+  number_of_nodes: 3
+  users:
+   - grid_user
+   - slurm
+  admins:
+   - jecoulte
