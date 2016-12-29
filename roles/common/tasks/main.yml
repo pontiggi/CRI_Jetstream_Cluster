@@ -1,4 +1,7 @@
 ---
+
+ - debug:
+     msg: "In common main!"
  
  - name: install libselinux-python packages (submit)
    yum: name=libselinux-python state=latest
@@ -97,6 +100,15 @@
      state: present
    tags:
      - export_home
+   when: submit_host == "yes"
+
+ - name: export /N to compute nodes
+   lineinfile:
+     dest: /etc/exports
+     line:  "/N 10.0.0.0/24(rw,no_root_squash)"
+     state: present
+   tags:
+     - export_N
    when: submit_host == "yes"
 
  - name: allow use_nfs_home_dirs
