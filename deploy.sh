@@ -2,14 +2,6 @@
 
 source ./stack_settings
 
-#openrc_loc=./openrc_slurm.sh #openrc.sh file - see Jetstream docs!
-#ssh_key=/home/jecoulte/.ssh/testkey.pub #ssh key for your nodes
-#ansible_loc=/home/jecoulte/Work/Tools/ansible/hacking/env-setup #ansible environment variables
-#deploy_log=./Cluster_deploy.log #log file
-#stack_name="test_stack" #name of the stack
-#declare -i number_of_nodes
-#number_of_nodes=4 #please don't make this anything other than an integer! It gets used in a regex below.
-
 #--------------------------------------------------------
 # NOTHING BELOW THIS SHOULD BE EDITED BY HAND 
 #(unless errors are encountered)
@@ -27,8 +19,22 @@ sed -i "s/\(\s\+number_of_nodes:\)\s\+[0-9]\+/\1 $number_of_nodes/" group_vars/a
 
 # use all nodes in test script
 sed -i "s/nodes=[0-9]\+/nodes=$number_of_nodes/" roles/users/files/node_query.job
-# create inventory/computes...
-#TODO
+
+# add users to group_vars/all
+#remove old user list
+sed -i '/users:/,$d' $vars_file
+
+echo "  users:" >> $vars_file
+for user in $users 
+do 
+ echo "   - $user" >> $vars_file
+done
+
+echo "  admins:" >> $vars_file
+for admin in $admins
+do
+ echo "   - $admin" >> $vars_file
+done
 
 #check if $ANSIBLE_HOME gets set on pip install ansible, and test for that, before attempting to source!
 #source $ansible_loc

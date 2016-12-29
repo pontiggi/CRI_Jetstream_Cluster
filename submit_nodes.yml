@@ -7,8 +7,10 @@
      - applications
      - ntp
 #     - torque
+     - {role: users, cleanup: "no"}
      - slurm
-     - postfix
+     - {role: users, cleanup: "yes"}
+#     - postfix
 
 #THE ROLES BELOW DO NOT EXIST
 #     - Maui_master

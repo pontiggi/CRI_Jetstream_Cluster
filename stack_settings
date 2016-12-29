@@ -8,6 +8,11 @@ deploy_log=./Cluster_deploy.log #log file
 
 stack_name="slurm_stack" #name of the stack
 
+#please don't make this anything other than an integer! It gets used in a regex!
 declare -i number_of_nodes
 number_of_nodes=3
-#please don't make this anything other than an integer! It gets used in a regex!
+
+vars_file="./group_vars/all"
+
+users="grid_user slurm"
+admins="jecoulte"
