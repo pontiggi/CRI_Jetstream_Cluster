@@ -35,41 +35,83 @@
      command: rpmbuild -ta slurm-{{ slurm_version }}.tar.bz2
      args:
        chdir: "/root/build/slurm-{{ slurm_version }}"
-       creates: "/root/build/slurm-{{ slurm_version }}/slurmctld.rpm"
+       creates: "/root/rpmbuild/RPMS/x86_64/slurm-{{ slurm_version }}-1.el7.centos.x86_64.rpm"
      when: submit_host == "yes"
 
-#may replace this by slurm rpmbuild?
-#   - name: copy compute packages back to management machine
-#     synchronize:
-#       mode: pull
-#       use_ssh_args: yes
-#       src: "/root/build/slurm-{{ slurm_version }}/{{ item }}"
-#       dest: roles/slurm/files/
-#     with_items:
-#       - "slurm-package-mom-linux-x86_64.sh"
-#       - "slurm-package-clients-linux-x86_64.sh"
-#       - "contrib/systemd/pbs_mom.service"
-#     when: submit_host == "yes"
+   - name: install slurm rpms
+     yum: 
+       name: "{{ item }}"
+       state: present
+     with_items:
+       - "/root/rpmbuild/RPMS/x86_64/slurm-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-devel-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-munge-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-openlava-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-pam_slurm-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-perlapi-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-plugins-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-seff-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-sjobexit-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-sjstat-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-slurmdbd-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-slurmdb-direct-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-sql-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
+     when: submit_host == "yes"
 
-#   - name: copy trqauthd.service to usr/lib/systemd/system/
-#     copy: src="/root/build/slurm-{{ slurm_version }}/contrib/systemd/trqauthd.service" dest="/usr/lib/systemd/system/" remote_src=True
-#     when: submit_host == "yes"
+   - name: create dir for rpms in /N
+     file: path="/N/slurm_rpms/" state=directory
+     when: submit_host == "yes"
 
-#   - name: create slurm.conf in /etc/ld.so.conf.d/
-#     lineinfile: dest=/etc/ld.so.conf.d/slurm.conf state=present line='/usr/local/lib' create=yes
-#     when: submit_host == "yes"
+   - name: copy slurm rpms to /N
+     copy:
+       remote_src: True
+       src: "{{ item }}"
+       dest: /N/slurm_rpms/
+     with_items:
+       - "/root/rpmbuild/RPMS/x86_64/slurm-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-devel-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-munge-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-perlapi-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-plugins-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-sjobexit-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-sjstat-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/root/rpmbuild/RPMS/x86_64/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
+     when: submit_host == "yes"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-seff-16.05.4-1.el7.centos.x86_64.rpm"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-slurmdbd-16.05.4-1.el7.centos.x86_64.rpm"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-slurmdb-direct-16.05.4-1.el7.centos.x86_64.rpm"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-sql-16.05.4-1.el7.centos.x86_64.rpm"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-openlava-16.05.4-1.el7.centos.x86_64.rpm"
+       #- "/root/rpmbuild/RPMS/x86_64/slurm-pam_slurm-16.05.4-1.el7.centos.x86_64.rpm"
 
-#   - name: run ldconfig
-#     command: ldconfig
-#     when: submit_host == "yes"
 
-#   - name: enable and start trqauthd
-#     service: name=trqauthd.service enabled=yes state=started
-#     when: submit_host == "yes"
+   - name: install slurm rpms
+     yum: 
+       name: "{{ item }}"
+       state: present
+     with_items:
+       - "/N/slurm_rpms/slurm-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-devel-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-munge-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-pam_slurm-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-perlapi-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-plugins-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-sjobexit-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-sjstat-16.05.4-1.el7.centos.x86_64.rpm"
+       - "/N/slurm_rpms/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
+     when: submit_host == "no"
 
-#   - name: populate nodes file
-#     template: src=pbs_queue.j2 dest=/var/spool/slurm/server_priv/nodes
-#     when: submit_host == "yes"
+   - name: create slurm.conf
+     template: src=slurm_conf.j2 dest=/etc/slurm/slurm.conf
+
+   - name: start slurmctld 
+     service: name=slurmctld state=restarted enabled=yes
+     when: submit_host == "yes"
+  
+   - name: start slurmd
+     service: name=slurmd state=restarted enabled=yes
+     when: submit_host == "no"
 
 #   - name: start pbs_server and pbs_sched on submit nodes
 #     service: name=pbs_{{ item }} state=started enabled=yes
@@ -96,8 +138,8 @@
        src: files/munge.key
        dest: /etc/munge/munge.key
      when: submit_host == "no"
-     with_fileglob:
-       - files/*munge.key
+#     with_fileglob:
+#       - files/*munge.key
 
    - name: enable and start munge
      service: name=munge.service enabled=yes state=started
