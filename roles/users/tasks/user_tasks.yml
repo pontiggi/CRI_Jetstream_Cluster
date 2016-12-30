@@ -14,11 +14,25 @@
  
  - name: get uid from submit_node
    getent: database=passwd key={{ user_name }} split=':'
+   when: submit_host == "yes"
 
- - name: copy key back to management machine
-   synchronize:
-     mode: pull
-     use_ssh_args: yes
-     src: /home/{{ item }}/.ssh/id_rsa.pub
-     dest: roles/grid_user/files/{{ inventory_hostname }}_{{ user_name }}_id_rsa.pub
+# - name: store uid as fact
+#   set_fact:
 
+ - name: create {{ user_name }} on compute node
+   user:
+     name: "{{ user_name }}"
+     shell: /bin/bash
+     generate_ssh_key: yes
+     state: present
+     createhome: no
+#     uid: 
+   when: submit_host == "no"
+
+# - name: copy key back to management machine
+#   synchronize:
+#     mode: pull
+#     use_ssh_args: yes
+#     src: /home/{{ item }}/.ssh/id_rsa.pub
+#     dest: roles/grid_user/files/{{ inventory_hostname }}_{{ user_name }}_id_rsa.pub
+#   when: submit_host == "yes"
