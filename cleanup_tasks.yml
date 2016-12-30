@@ -1,10 +1,10 @@
 ---
  - hosts: submit_nodes compute_nodes
    roles:
-   - {role: common, cleanup: "yes"}
-#   - {role: grid_user, cleanup: "yes"}
+#   - {role: common, cleanup: "yes"}
+# this was just restarting nfs...
    - {role: users, cleanup: "yes"}
 
- - hosts: submit_nodes
-   roles:
-     - torque_restart
+# - hosts: submit_nodes
+#   roles:
+#     - torque_restart
