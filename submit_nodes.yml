@@ -2,14 +2,13 @@
  - hosts: submit_nodes
    roles:
      - {role: common, cleanup: "no"}
-     - {role: grid_user, cleanup: "no"}
-     - xnit
-     - applications
-     - ntp
-#     - torque
      - {role: users, cleanup: "no"}
-     - slurm
-     - {role: users, cleanup: "yes"}
+     - ntp
+     - xnit
+#     - applications
+#     - torque
+#     - slurm
+#     - {role: users, cleanup: "yes"}
 #     - postfix
 
 #THE ROLES BELOW DO NOT EXIST
