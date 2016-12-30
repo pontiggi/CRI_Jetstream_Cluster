@@ -6,6 +6,6 @@
      - ntp
      - xnit
 #     - torque
-#     - slurm
+     - slurm
 #    - nfs_client
 #    - ganglia_client
