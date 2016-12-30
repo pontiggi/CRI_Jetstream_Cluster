@@ -3,12 +3,12 @@
  - set_fact:
      user_name: "{{ item }}"
 
- - name: copy ssh keys to all nodes for {{ user_name }}
-   authorized_key:
-     user: "{{ user_name }}"
-     key: "{{ lookup('file','{{ item }}') }} "
-   with_fileglob:
-     - files/*_id_rsa.pub 
+# - name: copy ssh keys to all nodes for {{ user_name }}
+#   authorized_key:
+#     user: "{{ user_name }}"
+#     key: "{{ lookup('file','{{ item }}') }} "
+#   with_fileglob:
+#     - files/*_id_rsa.pub 
 
  - name: provide sample pbs job script
    copy: src=node_query.job dest=/home/{{ user_name }}/node_query.job owner={{ user_name }} mode=644
