@@ -1,8 +1,5 @@
 ---
 
- - debug:
-     msg: "In common main!"
-
  - name: set preserve_hostname in /etc/cloud/cloud.cfg
    lineinfile: 
      dest: "/etc/cloud/cloud.cfg"
@@ -25,8 +22,8 @@
  - name: set up /etc/ssh/sshd_config
    template: src=sshd_config.j2 dest=/etc/ssh/sshd_config
 
- - name: reload sshd
-   service: name=sshd state=reloaded
+ - name: restart sshd
+   service: name=sshd state=restarted
 
  - name: set hostname
    hostname: name={{ inventory_hostname }}
@@ -60,6 +57,7 @@
      - "readline-devel"  #req for slurm
      - "pam-devel"       # req for slurm
      - "perl-ExtUtils-MakeMaker" # req for slurm
+     - "python-firewall"
 
  - name: install stuff from epel
    yum: name={{ item }} state=latest
@@ -100,6 +98,12 @@
      - export_home
    when: submit_host == "yes"
 
+ - name: allow all to write /N
+   file: 
+     path: /N/
+     state: directory
+     mode: 0777
+
  - name: export /N to compute nodes
    lineinfile:
      dest: /etc/exports
@@ -117,7 +121,11 @@
 
  - name: restart nfs
    service: name=nfs state=restarted
-   when: (submit_host == "yes" and cleanup == "yes")
+   when: (submit_host == "yes" and cleanup == "no")
+
+# - name: restart nfs
+#   service: name=nfs state=restarted
+#   when: (submit_host == "yes" and cleanup == "yes")
 
  - name: import /home on compute nodes
    lineinfile:
@@ -143,11 +151,10 @@
      - export_home
    when: submit_host == "no"
 
- - name: allow internal network through firewalld
-   firewalld:
-     rich_rule: "rule source address='10.0.0.0/24' family='ipv4' accept"
-     permanent: true
-     state: enabled
+ - name: disable firewalld so reboots don't break the cluster
+   service:
+     name: firewalld
+     enabled: False
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
