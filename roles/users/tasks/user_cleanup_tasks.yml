@@ -3,18 +3,15 @@
  - set_fact:
      user_name: "{{ item }}"
 
- - name: copy ssh keys to all nodes for {{ user_name }}
+ - name: authorize ssh keys to submit nodes for {{ user_name }}
    authorized_key:
      user: "{{ user_name }}"
-     key: "{{ lookup('file','{{ item }}') }} "
-   with_fileglob:
-     - files/{{ user_name }}_id_rsa.pub 
+     key: "{{ lookup('file','{}_id_rsa.pub'.format(user_name)) }} "
    when: submit_host == "yes"
 
  - name: provide sample pbs job script
    copy: src=node_query.job dest=/home/{{ user_name }}/node_query.job owner={{ user_name }} mode=644
    when: submit_host == "yes"
-   #copy: src=files/node_query.job dest=/home/{{ user_name }}/node_query.job owner={{ user_name }} mode=644
 
  - name: add module load to .bashrc...
    lineinfile: dest=/home/{{ user_name }}/.bashrc line="module load mpi" insertafter=EOF state=present owner={{ user_name }}
