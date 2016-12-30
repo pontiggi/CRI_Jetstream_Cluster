@@ -78,12 +78,6 @@
        - "/root/rpmbuild/RPMS/x86_64/slurm-sjstat-16.05.4-1.el7.centos.x86_64.rpm"
        - "/root/rpmbuild/RPMS/x86_64/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
      when: submit_host == "yes"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-seff-16.05.4-1.el7.centos.x86_64.rpm"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-slurmdbd-16.05.4-1.el7.centos.x86_64.rpm"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-slurmdb-direct-16.05.4-1.el7.centos.x86_64.rpm"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-sql-16.05.4-1.el7.centos.x86_64.rpm"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-openlava-16.05.4-1.el7.centos.x86_64.rpm"
-       #- "/root/rpmbuild/RPMS/x86_64/slurm-pam_slurm-16.05.4-1.el7.centos.x86_64.rpm"
 
 
    - name: install slurm rpms
@@ -108,42 +102,27 @@
      service: name=slurmctld state=restarted enabled=yes
      when: submit_host == "yes"
   
-   - name: start slurmd
-     service: name=slurmd state=restarted enabled=yes
-     when: submit_host == "no"
-
-#   - name: start pbs_server and pbs_sched on submit nodes
-#     service: name=pbs_{{ item }} state=started enabled=yes
-#     with_items:
-#       - "server"
-#       - "sched"
-#     when: submit_host == "yes"
-
-#   - name: copy mom and client packages to compute nodes
-#     synchronize:
-#       mode: push
-#       use_ssh_args: yes
-#       src: files/{{ item }}
-#       dest: "/root/{{ item }}"
-#     when: submit_host == "no"
-#     with_items:
-#       - "slurm-package-mom-linux-x86_64.sh"
-#       - "slurm-package-clients-linux-x86_64.sh"
-#       - "pbs_mom.service"
-
    - name: copy munge key from submit node
      synchronize:
        mode: push
-       src: files/munge.key
+       src: munge.key
        dest: /etc/munge/munge.key
+       set_remote_user: no
+       use_ssh_args: yes
      when: submit_host == "no"
-#     with_fileglob:
-#       - files/*munge.key
+
+   - name: fix perms on munge key
+     file: 
+       path: /etc/munge/munge.key
+       owner: munge
+       group: munge
+       mode: 0600
+     when: submit_host == "no"
 
    - name: enable and start munge
      service: name=munge.service enabled=yes state=started
      when: submit_host == "no"
 
-#   - name: install mom package on compute nodes
-#     command: "/root/slurm-package-mom-linux-x86_64.sh --install"
-#     when: submit_host == "no"
+   - name: start slurmd
+     service: name=slurmd state=restarted enabled=yes
+     when: submit_host == "no"
