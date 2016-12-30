@@ -2,6 +2,12 @@
 
  - debug:
      msg: "In common main!"
+
+ - name: set preserve_hostname in /etc/cloud/cloud.cfg
+   lineinfile: 
+     dest: "/etc/cloud/cloud.cfg"
+     line: "preserve_hostname: True"
+     state: present
  
  - name: install libselinux-python packages (submit)
    yum: name=libselinux-python state=latest
@@ -54,15 +60,6 @@
      - "readline-devel"  #req for slurm
      - "pam-devel"       # req for slurm
      - "perl-ExtUtils-MakeMaker" # req for slurm
-#     - "exportfs" 
-#     - "firewalld"
-
-# - name: fix broken http for epel on compute nodes
-#   lineinfile: 
-#     dest: "/etc/yum.repos.d/epel.repo"
-#     regexp: "mirrorlist\\=https\\:\\/\\/mirrors\\.fedoraproject\\.org\\/metalink\\?repo\\=epel\\-7\\&arch\\=\\$basearch"
-#     line: "mirrorlist=http://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch"
-#   when: submit_host == "no"
 
  - name: install stuff from epel
    yum: name={{ item }} state=latest
@@ -89,6 +86,7 @@
      regexp: "Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin"
      line: "Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin:/usr/local/bin"
      state: present
+
 # - name: install tinyproxy
 #   yum: name=tinyproxy state=present
 #   when: submit_host == "yes"
@@ -130,11 +128,26 @@
      - export_home
    when: submit_host == "no"
 
- - name: mount /home
+ - name: import /N on compute nodes
+   lineinfile:
+     dest: /etc/fstab
+     line:  "10.0.0.4:/N  /N  nfs  defaults 0 0"
+     state: present
+   tags:
+     - export_home
+   when: submit_host == "no"
+
+ - name: mount -a on compute nodes
    command: "mount -a"
    tags:
      - export_home
    when: submit_host == "no"
+
+ - name: allow internal network through firewalld
+   firewalld:
+     rich_rule: "rule source address='10.0.0.0/24' family='ipv4' accept"
+     permanent: true
+     state: enabled
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
