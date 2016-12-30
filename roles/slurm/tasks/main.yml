@@ -94,7 +94,6 @@
        - "/N/slurm_rpms/slurm-16.05.4-1.el7.centos.x86_64.rpm"
        - "/N/slurm_rpms/slurm-devel-16.05.4-1.el7.centos.x86_64.rpm"
        - "/N/slurm_rpms/slurm-munge-16.05.4-1.el7.centos.x86_64.rpm"
-       - "/N/slurm_rpms/slurm-pam_slurm-16.05.4-1.el7.centos.x86_64.rpm"
        - "/N/slurm_rpms/slurm-perlapi-16.05.4-1.el7.centos.x86_64.rpm"
        - "/N/slurm_rpms/slurm-plugins-16.05.4-1.el7.centos.x86_64.rpm"
        - "/N/slurm_rpms/slurm-sjobexit-16.05.4-1.el7.centos.x86_64.rpm"
