@@ -9,6 +9,7 @@
    group:
      name: wheel
      state: present
+   when: cleanup == "no"
 
  - name: allow nopasswd sudo for wheel
    lineinfile:
@@ -16,6 +17,7 @@
      state: present
      regexp: '^%wheel'
      line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+   when: cleanup == "no"
 
  - name: give admins power
    include: admin_tasks.yml
