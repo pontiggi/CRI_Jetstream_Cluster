@@ -22,7 +22,7 @@ parameters:
     type: number
     label: Cluster size
     description: Number of instances in cluster.
-    default: 4 # this is total size, includes head node and computes
+    default: 3 # this is total size, includes head node and computes
 
 resources:
 
@@ -58,7 +58,7 @@ resources:
         mkfs.xfs -K /dev/sdb1
         mkdir /N
         mount /dev/sdb1 /N -o noatime,discard
-        echo '/N 10.0.0.0/24(rw)' >> /etc/exports
+        echo '/N 10.0.0.0/24(rw,no_root_squash)' >> /etc/exports
         systemctl enable rpcbind
         systemctl enable nfs-server
         systemctl enable nfs-lock
