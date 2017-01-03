@@ -10,8 +10,9 @@
    when: submit_host == "yes"
 
  - name: provide sample pbs job script
-   copy: src=node_query.job dest=/home/{{ user_name }}/node_query.job owner={{ user_name }} mode=644
+   copy: src=slurm_example.job dest=/home/{{ user_name }}/slurm_example.job owner={{ user_name }} mode=644
    when: submit_host == "yes"
 
  - name: add module load to .bashrc...
    lineinfile: dest=/home/{{ user_name }}/.bashrc line="module load mpi" insertafter=EOF state=present owner={{ user_name }}
+   when: submit_host == "yes"
