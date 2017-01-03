@@ -56,8 +56,8 @@
        - "/root/rpmbuild/RPMS/x86_64/slurm-slurmdbd-16.05.4-1.el7.centos.x86_64.rpm"
        - "/root/rpmbuild/RPMS/x86_64/slurm-slurmdb-direct-16.05.4-1.el7.centos.x86_64.rpm"
        - "/root/rpmbuild/RPMS/x86_64/slurm-sql-16.05.4-1.el7.centos.x86_64.rpm"
-       - "/root/rpmbuild/RPMS/x86_64/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
      when: submit_host == "yes"
+#       - "/root/rpmbuild/RPMS/x86_64/slurm-torque-16.05.4-1.el7.centos.x86_64.rpm"
 
    - name: create dir for rpms in /N
      file: path="/N/slurm_rpms/" state=directory
