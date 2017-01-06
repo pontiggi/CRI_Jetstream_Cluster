@@ -1,0 +1,23 @@
+#!/bin/sh
+# run me with "sbatch slurm_example.job"
+# this is just a wall clock limit
+#SBATCH --time=1
+# the default is to combine stderr and stdout! (this writes all output to nodes.out)
+# for separate error file, use -e
+#SBATCH -o nodes.out
+# ask for 3 tasks total
+##SBATCH -n 3
+# ask for 3 tasks per node
+#SBATCH --ntasks-per-node=3
+# ask to run on 3 nodes
+#SBATCH -N 3
+
+/bin/hostname
+# -l lists the step # next to the output
+srun -l /bin/hostname
+srun -l /bin/pwd
+
+echo "BEGINNING MPI SECTION"
+
+#this will spawn a single mpi thread for each task!
+mpirun hostname
