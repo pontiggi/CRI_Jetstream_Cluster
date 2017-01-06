@@ -16,8 +16,12 @@
    when: submit_host == "yes"
    ignore_errors: yes
 
- - name: provide sample pbs job script
+ - name: provide sample slurm job script
    copy: src=slurm_example.job dest=/home/{{ user_name }}/slurm_example.job owner={{ user_name }} mode=644
+   when: submit_host == "yes"
+
+ - name: provide sample torque job script
+   copy: src=slurm_example.job dest=/home/{{ user_name }}/torque_example.job owner={{ user_name }} mode=644
    when: submit_host == "yes"
 
  - name: add module load to .bashrc...
