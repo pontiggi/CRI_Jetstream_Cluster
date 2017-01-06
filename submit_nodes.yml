@@ -5,9 +5,9 @@
      - {role: users, cleanup: "no"}
      - ntp
      - xnit
-#     - applications
-#     - torque
-     - slurm
+     - applications
+     - torque
+#     - slurm
 
 #THE ROLES BELOW DO NOT EXIST
 #     - postfix
