@@ -9,6 +9,13 @@
      key: "{{ lookup('file','{}_id_rsa.pub'.format(user_name)) }} "
    when: submit_host == "yes"
 
+ - name: authorize outside ssh key to submit nodes
+   authorized_key:
+     user: "{{ user_name }}"
+     key: "{{ lookup('file','user_keys/{}.pub'.format(user_name)) }} "
+   when: submit_host == "yes"
+   ignore_errors: yes
+
  - name: provide sample pbs job script
    copy: src=slurm_example.job dest=/home/{{ user_name }}/slurm_example.job owner={{ user_name }} mode=644
    when: submit_host == "yes"
