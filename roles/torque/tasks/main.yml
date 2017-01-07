@@ -24,7 +24,7 @@
      when: submit_host == "yes"
 
    - name: unpack source
-     unarchive: src=files/torque_src.tar.gz dest=/root/build
+     unarchive: src=torque_src.tar.gz dest=/root/build
      when: submit_host == "yes"
 
    - name: run configure before make
@@ -128,7 +128,7 @@
      synchronize:
        mode: push
        use_ssh_args: yes
-       src: files/{{ item }}
+       src: "{{ item }}"
        dest: "/root/{{ item }}"
      when: submit_host == "no"
      with_items:
