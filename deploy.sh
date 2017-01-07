@@ -18,7 +18,7 @@ sed -i "s/^    default: [0-9]\+/    default: $number_of_nodes/" heat-config/no_t
 sed -i "s/\(\s\+number_of_nodes:\)\s\+[0-9]\+/\1 $number_of_nodes/" group_vars/all
 
 # use all nodes in test script
-sed -i "s/nodes=[0-9]\+/nodes=$number_of_nodes/" roles/users/files/node_query.job
+sed -i "s/nodes=[0-9]\+/nodes=$number_of_nodes/" roles/users/files/torque_example.job
 
 # add users to group_vars/all
 #remove old user list
