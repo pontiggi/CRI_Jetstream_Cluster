@@ -6,6 +6,11 @@ via Heat scripts, in the heat-configs directory.
 In theory, this would work on bare metal as well, although it will not ease the pain of deploying CentOS 7 on many nodes, and you would need
 to hand-generate a list of IP addresses (or modify this to run a dhcp server on the head node...). 
 
+The main variables for a new virtual clsuter are all set in 
+the file "stack\_settings", which is used by deploy.sh. SSH
+keys for outside users should be copied to the
+roles/users/files/user\_keys directory.
+
 #How To - by 'hand'
 1. Get a working openrc.sh by following the Jetstream docs!
 
