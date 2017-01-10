@@ -1,10 +1,10 @@
 # Jetstream Cluster using Ansible
 
 This playbook is designed for setting up an HPC-style cluster in the Jetstream cloud environment. Actual provisioning of VM's is done
-via Heat scripts, available here [link]. 
+via Heat scripts, in the heat-configs directory.
 
 In theory, this would work on bare metal as well, although it will not ease the pain of deploying CentOS 7 on many nodes, and you would need
-to hand-generate a list of IP addresses (or modify this to run a dhcp server on the head node...).
+to hand-generate a list of IP addresses (or modify this to run a dhcp server on the head node...). 
 
 #How To - by 'hand'
 1. Get a working openrc.sh by following the Jetstream docs!
@@ -46,7 +46,7 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 4. Run deploy.sh, wait, ssh into your new cluster, and enjoy!
    See the file Cluster\_deploy.log or ssh.cfg for ip information.
 
-#IN CASE OF FAILURE (Or you want to build anew)
+#IN CASE OF FAILURE (Or you just want to build anew)
 
 1. Run destroy.sh and try again! 
 
@@ -56,25 +56,48 @@ to hand-generate a list of IP addresses (or modify this to run a dhcp server on 
 
 2. Fully elastic compute (dependent on 1.)
 
-3. Slurm option
-
 #Roles
 
 There are several roles here, which may be generally useful for some other things.
 Documentation on these will be forthcoming. A Slurm role is also in progress.
 
 ## Common
+This role handles setup of things common across the nodes - installing
+various utilities and common dependencies for scientific software,
+configuring the nfs mounts (/home and /N are shared across all nodes),
+and setting the hosts file correctly.
 
 ## Torque
 
-## grid\_user
+This role builds and configures a basic Torque (PBS) resource manager
+using the pbs\_sched scheduler, which is a basic 'first-in, first-out'
+scheduler. RPMs are built on the head node, and installed on compute
+nodes with this role.
 
-## postfix
+### torque\_restart
 
-## ssh\_and\_host\_keys
+This role just restarts the pbs\_server on the headnode after all 
+compute nodes are reporting in.
+
+## Slurm
+
+This role provides a working, basic slurm installation, with 
+FIFO scheduling and a single queue.
+
+## users
+
+The role reads from the users and admins list in stack\_settings,
+populates the users ssh keys from roles/files/users/user\_keys,
+and provides admins with sudo.
 
 ## xnit
 
-## torque
+This role installs and enables the XNIT repository.
 
-## torque\_restart
+## Applications
+
+This role installs a variety of scientific applications - either
+as a list, or a set of build steps. Currently only Quantum Espresso 
+is present as a set of steps; other software is available through
+the XNIT.
+
