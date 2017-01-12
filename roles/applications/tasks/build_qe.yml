@@ -1,0 +1,38 @@
+---
+
+#install/build QE
+#wget http://www.qe-forge.org/gf/download/frsrelease/211/968/espresso-5.4.0.tar.gz 
+ - name: get Quantum Espresso source
+   unarchive: src=http://www.qe-forge.org/gf/download/frsrelease/211/968/espresso-5.4.0.tar.gz dest=/home/grid_user remote_src=yes owner=grid_user group=users
+
+ - name: change source permissions
+   file: path=/home/grid_user/espresso-5.4.0 owner=grid_user group=users mode=775 recurse=yes state=directory
+
+# export LDFLAGS="-L /usr/lib64 -L /usr/lib/gcc/x86_64-redhat-linux/4.8.2"
+#./configure MPIF90=mpif90 FFLAGS="-O2" CC=gcc CFLAGS=-O3 ARCH=x86_64
+
+ - name: run configure
+   command: './configure MPIF90=mpif90 FFLAGS="-O2" CC=gcc CFLAGS=-O3 ARCH=x86_64'
+   args:
+     chdir: /home/grid_user/espresso-5.4.0
+     creates: /home/grid_user/espresso-5.4.0/make.sys
+   environment:
+     LDFLAGS: "-L /usr/lib64 -L /usr/lib/gcc/x86_64-redhat-linux/4.8.2"
+     PATH: "{{ ansible_env.PATH }}:/usr/lib64/openmpi/bin"
+   become: yes
+   become_user: grid_user
+
+ - name: make quantum espresso
+   make: 
+     chdir: /home/grid_user/espresso-5.4.0
+     target: all
+#     creates:
+   environment:
+     PATH: "{{ ansible_env.PATH }}:/usr/lib64/openmpi/bin"
+     LD_LIBRARY_PATH: "/usr/lib64/openmpi/lib"
+   become: yes
+   become_user: grid_user
+
+# edit environment variables file
+ - name: fix environment variables
+   copy: src=roles/applications/files/qe_environment_variables dest=/home/grid_user/espresso-5.4.0/environment_variables mode=755 owner=grid_user
