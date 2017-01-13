@@ -1,11 +1,16 @@
 ---
 
- - name: install scientific apps from XNIT
+ - name: install scientific apps from XNIT 
    yum: name={{ item }} state=present
    with_items:
     - "gromacs" #these need testing for the right package names!
     - "lammps"
+    - "lammps-openmpi"
+    - "lammps-doc"
     - "nwchem"
+    - "nwchem-common"
+    - "nwchem-openmpi"
+# need a way to install deps on compute nodes!
 
-- name: build and install Quantum Espresso
-  include: build_qe.yml
+ - name: build and install Quantum Espresso
+   include: build_qe.yml
