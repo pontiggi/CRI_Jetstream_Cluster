@@ -14,5 +14,5 @@ number_of_nodes=3
 
 vars_file="./group_vars/all"
 
-users="grid_user slurm"
-admins="jecoulte"
+users="grid_user"
+admins="jecoulte pamigids smarru snakanda"
