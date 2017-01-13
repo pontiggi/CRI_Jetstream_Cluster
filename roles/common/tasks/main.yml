@@ -58,6 +58,7 @@
      - "pam-devel"       # req for slurm
      - "perl-ExtUtils-MakeMaker" # req for slurm
      - "python-firewall"
+     - "fftw" # req for QE... need a better way to specify these!!!
 
  - name: install stuff from epel
    yum: name={{ item }} state=latest
