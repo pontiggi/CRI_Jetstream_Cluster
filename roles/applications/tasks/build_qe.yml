@@ -15,12 +15,16 @@
    command: './configure MPIF90=mpif90 FFLAGS="-O2" CC=gcc CFLAGS=-O3 ARCH=x86_64'
    args:
      chdir: /home/grid_user/espresso-5.4.0
-     creates: /home/grid_user/espresso-5.4.0/make.sys
+#     creates: /home/grid_user/espresso-5.4.0/make.sys
    environment:
      LDFLAGS: "-L /usr/lib64 -L /usr/lib/gcc/x86_64-redhat-linux/4.8.2"
      PATH: "{{ ansible_env.PATH }}:/usr/lib64/openmpi/bin"
+   register: config_log
    become: yes
    become_user: grid_user
+
+ - name: write config log
+   copy: content={{ config_log }} dest=/home/grid_user/espresso-5.4.0/configure.log
 
  - name: make quantum espresso
    make: 
@@ -30,9 +34,24 @@
    environment:
      PATH: "{{ ansible_env.PATH }}:/usr/lib64/openmpi/bin"
      LD_LIBRARY_PATH: "/usr/lib64/openmpi/lib"
+   register: make_log
    become: yes
    become_user: grid_user
+
+ - name: write make log
+   copy: content={{ make_log }} dest=/home/grid_user/espresso-5.4.0/make.log
 
 # edit environment variables file
  - name: fix environment variables
    copy: src=roles/applications/files/qe_environment_variables dest=/home/grid_user/espresso-5.4.0/environment_variables mode=755 owner=grid_user
+
+ - name: get pseudopotential library
+   unarchive: 
+    src: http://www.quantum-espresso.org/wp-content/uploads/upf_files/upf_files.tar 
+    dest: /home/grid_user/
+    remote_src: yes
+    owner: grid_user
+    group: grid_user
+
+ - name: rename pseudopotential dir
+   command: mv /home/grid_user/upf_files /home/grid_user/qe_pseudo2
