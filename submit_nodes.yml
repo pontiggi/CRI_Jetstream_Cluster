@@ -7,10 +7,10 @@
      - xnit
      - applications
      - torque
+     - postfix
 #     - slurm
 
 #THE ROLES BELOW DO NOT EXIST
-#     - postfix
 #     - Maui_master
 #     - nfs_server
 #      - ssh_gen_grid_user 
