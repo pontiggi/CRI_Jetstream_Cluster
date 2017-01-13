@@ -6,3 +6,6 @@ files/
 openrc*.sh
 *.log
 notes/
+deploy_seagrid.sh
+set_inventory_vars.sh
+seagrid_settings
