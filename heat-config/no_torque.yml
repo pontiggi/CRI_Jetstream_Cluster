@@ -12,7 +12,7 @@ parameters:
     type: string
     label: Flavor
     description: Type of instance (flavor) to be used
-    default: m1.small
+    default: m1.tiny
   key:
     type: string
     label: Key name
@@ -22,7 +22,7 @@ parameters:
     type: number
     label: Cluster size
     description: Number of instances in cluster.
-    default: 3 # this is total size, includes head node and computes
+    default: 2 # this is total size, includes head node and computes
 
 resources:
 
