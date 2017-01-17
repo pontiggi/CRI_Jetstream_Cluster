@@ -13,12 +13,43 @@
    when: submit_host == "yes"
 
 #THIS DOESN'T DO ANYTHING RIGHT NOW
-# - name: get uid from submit_node
-#   getent: database=passwd key={{ user_name }} split=':'
-#   when: submit_host == "yes"
+ - name: get uid from submit_node
+   getent: database=passwd key={{ user_name }} split=':'
+   when: submit_host == "yes"
 
 # - name: store uid as fact
 #   set_fact:
+#ok: [torque-server] => {
+#    "getent_passwd": {
+#        "grid_user": [
+#            "x", 
+#            "1001", 
+#            "1001", 
+#            "", 
+#            "/home/grid_user", 
+#            "/bin/bash"
+#        ]
+#    }
+#}
+ - name: store UID as fact
+   set_fact:
+    cluster_users: "{{ cluster_users|default({})|combine( { user_name: getent_passwd[user_name][2] }) }}"
+   when: submit_host == "yes"
+
+ - name: print getent results
+   debug:
+     var: getent_passwd.{{ user_name }}[2]
+   when: submit_host == "yes"
+
+# - name: print user UID
+#   debug:
+#     var: cluster_users
+#   when: submit_host == "yes"
+
+ - name: print {{ user_name }} UID
+   debug:
+     var: hostvars['torque-server']['cluster_users'][user_name] 
+   when: submit_host == "no"
 
  - name: create {{ user_name }} on compute node
    user:
@@ -27,7 +58,7 @@
      generate_ssh_key: yes
      state: present
      createhome: no
-#     uid: 
+     uid: "{{ hostvars['torque-server']['cluster_users'][user_name] }}"
    when: submit_host == "no"
 
  - name: copy key back to management machine
