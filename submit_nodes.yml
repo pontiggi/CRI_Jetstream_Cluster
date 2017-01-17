@@ -2,13 +2,13 @@
  - hosts: submit_nodes
    roles:
      - {role: common, cleanup: "no"}
-     - {role: users, cleanup: "no"}
+     - {role: users, cleanup: "no", tags: users}
      - ntp
      - xnit
      - applications
-     - torque
+#     - torque
      - postfix
-#     - slurm
+     - slurm
 
 #THE ROLES BELOW DO NOT EXIST
 #     - Maui_master

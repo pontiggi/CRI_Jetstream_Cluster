@@ -2,7 +2,7 @@
  - hosts: compute_nodes
    roles:
      - {role: common, cleanup: "no"}
-     - {role: users, cleanup: "no"}
+     - {role: users, cleanup: "no", tags: users}
      - ntp
      - xnit
 #     - torque
