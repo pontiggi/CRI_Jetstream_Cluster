@@ -13,8 +13,8 @@ roles/users/files/user\_keys directory.
 
 #How To - by 'hand'
 1. Get a working openrc.sh by following the Jetstream docs!
-..+ *NOTE* : This playbook *requires* the heat module to be installed on the openstack cloud you are using! 
-If you run into problems, check with `openstack catalog list` that your cloud has the right modules available. 
+  + *NOTE* : This playbook *requires* the heat module to be installed on the openstack cloud you are using! 
+   If you run into problems, check with `openstack catalog list` that your cloud has the right modules available. 
 
 2. Install ansible,  or clone the repo and remember where the 
    environment variables script is.
