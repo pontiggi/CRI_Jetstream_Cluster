@@ -51,6 +51,16 @@
      - { src: suspend_prog.sh, dest: /home/slurm/suspend_prog.sh }
      - { src: resume_prog.sh, dest: /home/slurm/resume_prog.sh }
 
+ - name: set suspend and resume scripts executable
+   file:
+     path: "{{ item }}"
+     mode: 0755
+     owner: slurm
+     group: slurm
+   with_items:
+     - "/home/slurm/suspend_prog.sh"
+     - "/home/slurm/resume_prog.sh"
+
  - name: restart slurmctld
    service: name=slurmctld state=restarted enabled=yes
 
