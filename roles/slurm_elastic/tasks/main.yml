@@ -1,0 +1,34 @@
+---
+
+ - name: set suspend program
+   lineinfile: 
+     line: "SuspendProgram=/home/slurm/suspend_prog.sh" 
+     dest: etc/slurm/slurm.conf 
+     regexp: '^#SuspendProgram|^SuspendProgram'
+     state: present
+
+ - name: set resume program
+   lineinfile: 
+     line: "ResumeProgram=/home/slurm/resume_prog.sh" 
+     dest: etc/slurm/slurm.conf 
+     regexp: '^#ResumeProgram|^ResumeProgram'
+     state: present
+
+ - name: set slurm suspend/resume timing parameters
+   lineinfile: 
+     line: { item.line }
+     dest: etc/slurm/slurm.conf 
+     regexp: { item.regexp }
+     state: present
+   with_items:
+     - { line:'#SuspendTime=' , regexp: '^#SuspendTime|^SuspendTime'}
+     - { line:'#SuspendRate=' , regexp: '^#SuspendRate|^SuspendRate'}
+     - { line:'#ResumeRate=' , regexp: '^#ResumeRate|^ResumeRate'}
+     - { line:'#SuspendTimeout=' , regexp: '^#SuspendTimeout|^SuspendTimeout'}
+     - { line:'#ResumeTimeout=' , regexp: '^#ResumeTimeout|^ResumeTimeout'}
+     - { line:'#BatchStartTimeout=' , regexp: '^#BatchStartTimeout|^BatchStartTimeout'}
+
+
+ - name: copy openrc
+
+ - name: copy suspend and resume scripts
