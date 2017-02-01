@@ -152,10 +152,10 @@
      - export_home
    when: submit_host == "no"
 
- - name: disable firewalld so reboots don't break the cluster
-   service:
-     name: firewalld
-     enabled: False
+# - name: disable firewalld so reboots don't break the cluster
+#   service:
+#     name: firewalld
+#     enabled: False
 
 # - name: configure tinyproxy on head node
 #   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
