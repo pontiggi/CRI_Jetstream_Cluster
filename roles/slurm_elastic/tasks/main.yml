@@ -1,5 +1,20 @@
 ---
 
+ - name: yum install openstack repo
+   yum: name="centos-release-openstack-liberty" state=present
+
+ - name: yum install dependencies
+   yum: name={{ item }} state=present
+   with_items:
+     - "python-openstackclient"
+     - "python-novaclient"
+     - "python-keystoneclient"
+     - "python-heatclient"
+     - "python-swiftclient"
+     - "python-neutronclient"
+     - "python-cinderclient"
+     - "python-glanceclient"
+
  - name: set suspend program
    lineinfile: 
      line: "SuspendProgram=/home/slurm/suspend_prog.sh" 
@@ -35,4 +50,7 @@
      - { src: openrc.sh, dest:/home/slurm/openrc.sh }
      - { src: suspend_prog.sh, dest:/home/slurm/suspend_prog.sh }
      - { src: resume_prog.sh, dest:/home/slurm/resume_prog.sh }
+
+ - name: restart slurmctld
+   service: name=slurmctld state=restarted enabled=yes
 
