@@ -18,38 +18,38 @@
  - name: set suspend program
    lineinfile: 
      line: "SuspendProgram=/home/slurm/suspend_prog.sh" 
-     dest: etc/slurm/slurm.conf 
+     dest: /etc/slurm/slurm.conf 
      regexp: '^#SuspendProgram|^SuspendProgram'
      state: present
 
  - name: set resume program
    lineinfile: 
      line: "ResumeProgram=/home/slurm/resume_prog.sh" 
-     dest: etc/slurm/slurm.conf 
+     dest: /etc/slurm/slurm.conf 
      regexp: '^#ResumeProgram|^ResumeProgram'
      state: present
 
  - name: set slurm suspend/resume timing parameters
    lineinfile: 
-     line: {{ item.line }}
-     dest: etc/slurm/slurm.conf 
-     regexp: {{ item.regexp }}
+     line: "{{ item.line }}"
+     dest: /etc/slurm/slurm.conf 
+     regexp: "{{ item.regexp }}"
      state: present
    with_items:
-     - { line:'#SuspendTime=' , regexp: '^#SuspendTime|^SuspendTime'}
-     - { line:'#SuspendRate=' , regexp: '^#SuspendRate|^SuspendRate'}
-     - { line:'#ResumeRate=' , regexp: '^#ResumeRate|^ResumeRate'}
-     - { line:'#SuspendTimeout=' , regexp: '^#SuspendTimeout|^SuspendTimeout'}
-     - { line:'#ResumeTimeout=' , regexp: '^#ResumeTimeout|^ResumeTimeout'}
-     - { line:'#BatchStartTimeout=' , regexp: '^#BatchStartTimeout|^BatchStartTimeout'}
+     - { line: "#SuspendTime=" , regexp: "^#SuspendTime|^SuspendTime" }
+     - { line: "#SuspendRate=" , regexp: "^#SuspendRate|^SuspendRate" }
+     - { line: "#ResumeRate=" , regexp: "^#ResumeRate|^ResumeRate" }
+     - { line: "#SuspendTimeout=" , regexp: "^#SuspendTimeout|^SuspendTimeout" }
+     - { line: "#ResumeTimeout=" , regexp: "^#ResumeTimeout|^ResumeTimeout" }
+     - { line: "#BatchStartTimeout=" , regexp: "^#BatchStartTimeout|^BatchStartTimeout" }
 
 
  - name: copy openrc, suspend, and resume scripts
-   copy: src={{ item.src }} dest={{ item.line }} owner=slurm mode=644
+   copy: src={{ item.src }} dest={{ item.dest }} owner=slurm mode=644
    with_items:
-     - { src: openrc.sh, dest:/home/slurm/openrc.sh }
-     - { src: suspend_prog.sh, dest:/home/slurm/suspend_prog.sh }
-     - { src: resume_prog.sh, dest:/home/slurm/resume_prog.sh }
+     - { src: openrc.sh, dest: /home/slurm/openrc.sh }
+     - { src: suspend_prog.sh, dest: /home/slurm/suspend_prog.sh }
+     - { src: resume_prog.sh, dest: /home/slurm/resume_prog.sh }
 
  - name: restart slurmctld
    service: name=slurmctld state=restarted enabled=yes
