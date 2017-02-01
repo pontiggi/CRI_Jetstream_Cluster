@@ -16,9 +16,9 @@
 
  - name: set slurm suspend/resume timing parameters
    lineinfile: 
-     line: { item.line }
+     line: {{ item.line }}
      dest: etc/slurm/slurm.conf 
-     regexp: { item.regexp }
+     regexp: {{ item.regexp }}
      state: present
    with_items:
      - { line:'#SuspendTime=' , regexp: '^#SuspendTime|^SuspendTime'}
@@ -29,6 +29,10 @@
      - { line:'#BatchStartTimeout=' , regexp: '^#BatchStartTimeout|^BatchStartTimeout'}
 
 
- - name: copy openrc
+ - name: copy openrc, suspend, and resume scripts
+   copy: src={{ item.src }} dest={{ item.line }} owner=slurm mode=644
+   with_items:
+     - { src: openrc.sh, dest:/home/slurm/openrc.sh }
+     - { src: suspend_prog.sh, dest:/home/slurm/suspend_prog.sh }
+     - { src: resume_prog.sh, dest:/home/slurm/resume_prog.sh }
 
- - name: copy suspend and resume scripts
