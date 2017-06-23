@@ -12,7 +12,7 @@ parameters:
     type: string
     label: Flavor
     description: Type of instance (flavor) to be used
-    default: m1.tiny
+    default: m1.small
   key:
     type: string
     label: Key name
@@ -22,7 +22,7 @@ parameters:
     type: number
     label: Cluster size
     description: Number of instances in cluster.
-    default: 2 # this is total size, includes head node and computes
+    default: 3 # this is total size, includes head node and computes
 
 resources:
 
@@ -119,7 +119,7 @@ resources:
     properties:
       handle: { get_resource: wait_handle }
       count: 1
-      timeout: 600
+      timeout: 900
 
   wait_handle:
     type: OS::Heat::WaitConditionHandle
@@ -167,7 +167,7 @@ resources:
   shared_volume:
     type: OS::Cinder::Volume
     properties:
-      size: 1024
+      size: 50
   shared_volume_attachment:
     type: OS::Cinder::VolumeAttachment
     properties:
