@@ -43,12 +43,12 @@ done
 # ASSUME THE USER HAS A WORKING openrc.sh 
 source $openrc_loc
 
-nova_result=$(nova keypair-add --pub-key $ssh_key jetstream_key 2>&1)
-echo "Nova Result: $nova_result" >> $deploy_log
+key_create_result=$(openstack keypair create --public-key $ssh_key new_jetstream_key 2>&1)
+echo "Key creation Result: $key_create_result" >> $deploy_log
 
 # if there is no error,  or the error is "key-pair already exists" then we are ok to continue; otherwise, print and exit
-if [[ ! ${nova_result} != "" || ! ${nova_result} =~ .*already\ exists.* ]]; then
- echo "NOVA ERROR: $nova_result" | tee -a $deploy_log
+if [[ ! ${key_create_result} != "" || ! ${key_create_result} =~ .*already\ exists.* ]]; then
+ echo "OPENSTACK ERROR: $key_create_result" | tee -a $deploy_log
  exit
 fi
 
@@ -56,7 +56,7 @@ fi
 stack_exists=$(openstack stack list | grep $stack_name)
 if [[ -z $stack_exists ]]; then 
  echo "Creating Stack!"
- openstack stack create --parameter key=jetstream_key -t ./heat-config/no_torque.yml $stack_name | tee -a $deploy_log
+ openstack stack create --parameter key=new_jetstream_key -t ./heat-config/no_torque.yml $stack_name | tee -a $deploy_log
 else
  echo "Stack exists: continuing."
 fi
@@ -88,7 +88,7 @@ fi
 if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   echo "Stack build Complete!" | tee -a $deploy_log
   headnode_id_hash=$(openstack stack resource list $stack_name | awk '/torque_server / {print $4}')
-  headnode_ip=$(nova floating-ip-list | awk "/$headnode_id_hash/"'{print $4}')
+  headnode_ip=$(openstack floating ip nist | awk "/$headnode_id_hash/"'{print $4}')
 
   echo "Setting ip in ansible config files..." | tee -a $deploy_log
 # replace ip address in ssh.cfg and inventory- now we have 10 problems!!! (possibly 11)
