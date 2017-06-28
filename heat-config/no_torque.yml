@@ -7,7 +7,7 @@ parameters:
     type: string
     label: Image name or ID
     description: Image to be used for compute instance
-    default: "CentOS-7-x86_64-GenericCloud-1607"
+    default: "CentOS-7-x86_64-GenericCloud-1607" #TRY THIS NEXT: "JS-API-Featured-Centos7-Feb-7-2017"
   flavor: # this is just for the head node
     type: string
     label: Flavor
@@ -22,7 +22,7 @@ parameters:
     type: number
     label: Cluster size
     description: Number of instances in cluster.
-    default: 3 # this is total size, includes head node and computes
+    default: 2 # this is total size, includes head node and computes
 
 resources:
 
@@ -128,7 +128,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: torque_server
-      security_groups: [ default ]
+      security_groups: [ default, global-ssh ]
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key }
