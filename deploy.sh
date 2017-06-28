@@ -88,7 +88,7 @@ fi
 if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   echo "Stack build Complete!" | tee -a $deploy_log
   headnode_id_hash=$(openstack stack resource list $stack_name | awk '/torque_server / {print $4}')
-  headnode_ip=$(openstack floating ip nist | awk "/$headnode_id_hash/"'{print $4}')
+  headnode_ip=$(openstack floating ip list | awk "/$headnode_id_hash/"'{print $4}')
 
   echo "Setting ip in ansible config files..." | tee -a $deploy_log
 # replace ip address in ssh.cfg and inventory- now we have 10 problems!!! (possibly 11)
