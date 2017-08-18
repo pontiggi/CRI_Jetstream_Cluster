@@ -87,8 +87,9 @@ fi
 
 if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   echo "Stack build Complete!" | tee -a $deploy_log
-  headnode_id_hash=$(openstack stack resource list $stack_name | awk '/torque_server / {print $4}')
-  headnode_ip=$(openstack floating ip list | awk "/$headnode_id_hash/"'{print $4}')
+  headnode_id_hash=$(openstack stack resource list $stack_name | awk '/slurm-server / {print $4}')
+  headnode_ip=$(openstack stack output show $stack_name public_ip | awk '/output_value/ {print $4}')
+  headnode_private_ip=$(openstack stack output show $stack_name private_ip | awk '/output_value/ {print $4}')
 
   echo "Setting ip in ansible config files..." | tee -a $deploy_log
 # replace ip address in ssh.cfg and inventory- now we have 10 problems!!! (possibly 11)
@@ -97,29 +98,30 @@ if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   echo "Headnode ip: $headnode_ip - testing ssh..." | tee -a $deploy_log
 
   ssh_hostname=$(ssh -F ssh.cfg $headnode_ip 'hostname' 2>&1 | tee -a $deploy_log) 
-  if [[ ! $ssh_hostname =~ "torque-server" ]]; then
+  if [[ ! $ssh_hostname =~ "slurm-server" ]]; then
     echo "ssh connection to headnode Failed! Please try again." | tee -a $deploy_log
     echo "SSH ERROR: $ssh_hostname" | tee -a $deploy_log
     exit
   else
 # test compute nodes and generate inventory file
-    declare -i last_node=$number_of_nodes+4
+    declare -i last_node=$number_of_nodes-1
     echo "Connection made to head node - testing computes now." | tee -a $deploy_log
     echo "[compute_nodes]" > $compute_inventory
 
-    for i in $(seq 5 $last_node) 
+    for i in $(seq 0 $last_node) 
     do
-      ssh_compute=$(ssh -q -F ssh.cfg 10.0.0.$i 'hostname' 2>&1) 
-      echo "Result of connecting to 10.0.0.$i : $ssh_compute" | tee -a $deploy_log
+      compute_ip=$(openstack server show compute-$i | awk '/addresses/ {print $4}' | cut -d'=' -f 2)
+      ssh_compute=$(ssh -q -F ssh.cfg $compute_ip 'hostname' 2>&1) 
+      echo "Result of connecting to $compute_ip : $ssh_compute" | tee -a $deploy_log
       if [[ ! $ssh_compute =~ 'compute-' ]]; then
         echo "Failed to connect! Check compute node build and try again." | tee -a $deploy_log 
         exit #fail hard if a node is broken
       fi
 # add or correct entry in inventory file if needed
       if [[ $(grep $ssh_compute $compute_inventory) == "" ]]; then
-        echo "$ssh_compute ansible_connection=ssh ansible_host=10.0.0.$i ansible_user=centos ansible_become=true become_method=sudo" >> $compute_inventory
+        echo "$ssh_compute ansible_connection=ssh ansible_host=$compute_ip ansible_user=centos ansible_become=true become_method=sudo" >> $compute_inventory
       else
-        sed -i "s/$ssh_compute\(.*\)=10.0.0.[0-9]\+\(.*\)/$ssh_compute\1=10.0.0.$i\2/" $compute_inventory
+        sed -i "s/$ssh_compute\(.*\)=10.0.0.[0-9]\+\(.*\)/$ssh_compute\1=$compute_ip\2/" $compute_inventory
       fi 
     done
   fi
