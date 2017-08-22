@@ -52,6 +52,17 @@ if [[ ! ${key_create_result} != "" || ! ${key_create_result} =~ .*already\ exist
  exit
 fi
 
+#check if global-ssh security group exists:
+sec_group_check=$(openstack security group list | grep "global-ssh")
+if [[ -z $sec_group_check ]]; then
+  echo "creating global-ssh security group!"
+  openstack security group create --description "ssh & icmp enabled" global-ssh
+  openstack security group rule create --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 global-ssh
+  openstack security group rule create --protocol icmp global-ssh
+else
+  echo "global-ssh security group exists!"
+fi
+
 # current heat config has no shared volume due to acccount restricitons...
 stack_exists=$(openstack stack list | grep $stack_name)
 if [[ -z $stack_exists ]]; then 
