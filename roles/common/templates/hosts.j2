@@ -1,7 +1,7 @@
 127.0.0.1 {{ inventory_hostname }} localhost
 
 {% for host in groups['submit_nodes'] %}
-{{ headnode_ip }} {{ hostvars[host]['inventory_hostname'] }}  {{ hostvars[host]['inventory_hostname'] }}.jetstreamlocal
+{{ headnode_private_ip }} {{ hostvars[host]['inventory_hostname'] }}  {{ hostvars[host]['inventory_hostname'] }}.jetstreamlocal
 {% endfor %}
 
 {% for host in groups['compute_nodes'] %}

@@ -107,7 +107,7 @@ if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" ssh.cfg
   sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" $submit_inventory
 # set headnode in group_vars/all
-  sed -i "s/\(\s\+headnode_ip:\).*/\1 $headnode_ip/" group_vars/all
+  sed -i "s/\(\s\+headnode_private_ip:\).*/\1 $headnode_private_ip/" group_vars/all
   echo "Headnode ip: $headnode_ip - testing ssh..." | tee -a $deploy_log
 
   ssh_hostname=$(ssh -F ssh.cfg $headnode_ip 'hostname' 2>&1 | tee -a $deploy_log) 
