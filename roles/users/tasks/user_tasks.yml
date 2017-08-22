@@ -19,7 +19,7 @@
 
 # - name: store uid as fact
 #   set_fact:
-#ok: [torque-server] => {
+#ok: [slurm-server] => {
 #    "getent_passwd": {
 #        "grid_user": [
 #            "x", 
@@ -48,7 +48,7 @@
 
  - name: print {{ user_name }} UID
    debug:
-     var: hostvars['torque-server']['cluster_users'][user_name] 
+     var: hostvars['slurm-server']['cluster_users'][user_name] 
    when: submit_host == "no"
 
  - name: create {{ user_name }} on compute node
@@ -58,7 +58,7 @@
      generate_ssh_key: yes
      state: present
      createhome: no
-     uid: "{{ hostvars['torque-server']['cluster_users'][user_name] }}"
+     uid: "{{ hostvars['slurm-server']['cluster_users'][user_name] }}"
    when: submit_host == "no"
 
  - name: copy key back to management machine
