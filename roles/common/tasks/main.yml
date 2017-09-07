@@ -53,6 +53,7 @@
      - "net-tools"
      - "strace"
      - "fail2ban"
+     - "firewalld"
      - "wget"  # needed for building QE
      - "readline-devel"  #req for slurm
      - "pam-devel"       # req for slurm
@@ -152,16 +153,8 @@
      - export_home
    when: submit_host == "no"
 
-# - name: disable firewalld so reboots don't break the cluster
-#   service:
-#     name: firewalld
-#     enabled: False
+ - name: import firewalld public zone
+   template: src=public.xml dest=/etc/firewalld/zones/public.xml
 
-# - name: configure tinyproxy on head node
-#   template: src=tinyproxy.conf.j2 dest=/etc/tinyproxy/tinyproxy.conf
-#   when: submit_host == "yes"
-
-# - name: start tinyproxy
-#   service: name=tinyproxy state=restarted enabled=yes
-#   when: submit_host == "yes"
-
+ - name: restart/enable firewalld
+   service: name=firewalld state=restarted enabled=yes
