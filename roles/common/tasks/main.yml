@@ -132,7 +132,7 @@
  - name: import /home on compute nodes
    lineinfile:
      dest: /etc/fstab
-     line:  "{{ headnode_ip }}:/home  /home  nfs  defaults 0 0"
+     line:  "{{ headnode_private_ip }}:/home  /home  nfs  defaults 0 0"
      state: present
    tags:
      - export_home
@@ -141,7 +141,7 @@
  - name: import /N on compute nodes
    lineinfile:
      dest: /etc/fstab
-     line:  "{{ headnode_ip }}:/N  /N  nfs  defaults 0 0"
+     line:  "{{ headnode_private_ip }}:/N  /N  nfs  defaults 0 0"
      state: present
    tags:
      - export_home

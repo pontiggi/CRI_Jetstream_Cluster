@@ -52,6 +52,17 @@ if [[ ! ${key_create_result} != "" || ! ${key_create_result} =~ .*already\ exist
  exit
 fi
 
+#check if global-ssh security group exists:
+sec_group_check=$(openstack security group list | grep "global-ssh")
+if [[ -z $sec_group_check ]]; then
+  echo "creating global-ssh security group!"
+  openstack security group create --description "ssh & icmp enabled" global-ssh
+  openstack security group rule create --protocol tcp --dst-port 22:22 --remote-ip 0.0.0.0/0 global-ssh
+  openstack security group rule create --protocol icmp global-ssh
+else
+  echo "global-ssh security group exists!"
+fi
+
 # current heat config has no shared volume due to acccount restricitons...
 stack_exists=$(openstack stack list | grep $stack_name)
 if [[ -z $stack_exists ]]; then 
@@ -96,7 +107,7 @@ if [[ $stack_build_status == "CREATE_COMPLETE" ]]; then
   sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" ssh.cfg
   sed -i "s/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/$headnode_ip/" $submit_inventory
 # set headnode in group_vars/all
-  sed -i "s/\(\s\+headnode_ip:\).*/\1 $headnode_ip/" group_vars/all
+  sed -i "s/\(\s\+headnode_private_ip:\).*/\1 $headnode_private_ip/" group_vars/all
   echo "Headnode ip: $headnode_ip - testing ssh..." | tee -a $deploy_log
 
   ssh_hostname=$(ssh -F ssh.cfg $headnode_ip 'hostname' 2>&1 | tee -a $deploy_log) 

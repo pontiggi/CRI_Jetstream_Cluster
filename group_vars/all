@@ -3,8 +3,8 @@
   torque_version: 6.0.2-1469811694_d9a3483
   slurm_version: 16.05.4
 # BELOW THIS EDITED AUTOMATICALLY BY deploy.sh
-  number_of_nodes: 1
-  headnode_ip: 10.0.0.4
+  number_of_nodes: 3
+  headnode_private_ip: 10.0.0.12
   users:
    - grid_user
    - slurm

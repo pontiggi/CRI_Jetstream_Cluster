@@ -89,7 +89,7 @@ resources:
     type: OS::Nova::Server
     properties:
       name: { get_param: name }
-      flavor: m1.small
+      flavor: m1.large
       image: { get_param: image }
       key_name: { get_param: key }
       user_data_format: SOFTWARE_CONFIG
